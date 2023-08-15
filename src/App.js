@@ -69,8 +69,15 @@ function App() {
     "/subscriptions",
     "/channel-groups",
     "/library",
-    "/watch"
+    "/watch",
+    "/channel",
   ]
+
+  function isPathAllowed(path) {
+    if (allowedRoutes.includes(path)) return true;
+    if (path.startsWith("/channel/")) return true;
+    return false;
+  }
 
   useEffect(() => {
     checkAuthStatus();
@@ -84,7 +91,7 @@ function App() {
       <AllRoutes />
 
       {
-        allowedRoutes.includes(currentPath) === true && <Footer />
+        isPathAllowed(currentPath) === true && <Footer />
       }
     </div>
   );
