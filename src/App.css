@@ -80,6 +80,15 @@
   font-family: 'Roboto', sans-serif;
 }
 
+.scroll-hide::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+}
+
+.scroll-hide {
+  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
 @media (min-width: 640px) {
   .home_page {
     background-color: #0f0f0f;
