@@ -43,7 +43,7 @@ export const AllRoutes = () => {
                 {/* Utility Pages */}
                 <Route path='/signin' element={<SignIn />} />
                 <Route path='/watch' element={<Watch />} />
-                <Route path='/channel' element={<Channel />} />
+                <Route path='/channel/:channelId' element={<Channel />} />
                 <Route path='/playlist' element={<Playlist />} />
                 <Route path='/results' element={<Results />} />
                 <Route path='/settings' element={<PrivateRoute><Settings /></PrivateRoute>} />
