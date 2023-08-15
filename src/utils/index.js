@@ -32,5 +32,6 @@ export {
 // Helper utils
 export { 
     waitFor, 
-    isValid 
+    isValid,
+    shuffleArray 
 } from './helper';
