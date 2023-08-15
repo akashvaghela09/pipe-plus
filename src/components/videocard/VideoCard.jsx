@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { TiTick } from 'react-icons/ti';
-import { formatTime, formatNumbers, formatReadableDate } from '../../utils';
+import { formatTime, formatNumbers, formatReadableDate, isValid } from '../../utils';
 
 export const VideoCard = ({ video }) => {
     const {
         title,
         duration,
         thumbnail,
-        uploadedDate,
+        thumbnailUrl,
         uploaded,
+        uploadDate,
+        uploadedDate,
         uploaderAvatar,
         uploaderName,
+        uploader,
         // uploaderUrl, 
         uploaderVerified,
         url,
@@ -22,7 +25,7 @@ export const VideoCard = ({ video }) => {
             <div className='relative w-full rounded-xl'>
                 <img
                     loading='lazy'
-                    src={thumbnail}
+                    src={thumbnail ? thumbnail : thumbnailUrl}
                     className='w-full aspect-video lg:rounded-xl z-10 cursor-pointer'
                 />
                 <p className='absolute bottom-1 right-1 px-1 rounded-md text-sm text-slate-50 bg-black'>{formatTime(duration)}</p>
@@ -32,11 +35,11 @@ export const VideoCard = ({ video }) => {
                 <div className='flex flex-col grow'>
                     <p className='text-slate-50 line-clamp-2 leading-6'>{title}</p>
                     <span className='text-slate-100 opacity-50 text-xs flex lg:hidden'>
-                        <p className='line-clamp-1'>{uploaderName}</p>
+                        <p className='line-clamp-1'>{uploaderName === undefined ? uploader : uploaderName}</p>
                         <p className='px-2'>•</p>
                         <p className='whitespace-nowrap'>{formatNumbers(views)} views</p>
                         <p className='px-2'>•</p>
-                        <p className='whitespace-nowrap'>{uploadedDate ? uploadedDate : formatReadableDate(uploaded)}</p>
+                        <p className='whitespace-nowrap'>{uploadedDate ? uploadedDate : uploaded ? formatReadableDate(uploaded) : formatReadableDate(uploadDate)}</p>
                     </span>
                     <div className='hidden lg:flex flex-col'>
                         <div className='flex items-center justify-start gap-2'>
