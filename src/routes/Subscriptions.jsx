@@ -39,7 +39,7 @@ export const Subscriptions = () => {
             {
                 sidepanelOpen && <div className="w-[300px] hidden sm:border-spacing-0 md:flex" />
             }
-            <div className="w-full h-full grid grid-cols-1 p-4 gap-5 home_page">
+            <div className="w-full h-full grid grid-cols-1 lg:p-4 gap-5 home_page">
                 {
                     feedStreams.length > 0 && feedStreams.map((item) => {
                         return <Link to={item.url} key={item.id}>
