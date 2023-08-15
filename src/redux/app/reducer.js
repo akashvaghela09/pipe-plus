@@ -1,11 +1,13 @@
 import { 
     SET_SIDE_PANEL_VALUE,
-    SET_DEVICE_TYPE
+    SET_DEVICE_TYPE,
+    SET_PAGE_LOADING
 } from './actionTypes';
 
 const initialState = {
     sidepanelOpen: true,
-    deviceType: "desktop"
+    deviceType: "desktop",
+    pageLoading: false
 }
 
 const reducer = (state = initialState, {type, payload}) => {
@@ -20,6 +22,11 @@ const reducer = (state = initialState, {type, payload}) => {
             return {
                 ...state,
                 deviceType: payload
+            }
+        case SET_PAGE_LOADING:
+            return {
+                ...state,
+                pageLoading: payload
             }
         default:
             return state
