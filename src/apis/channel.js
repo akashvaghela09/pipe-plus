@@ -1,5 +1,7 @@
+import { config } from "../configs/config";
 import { supabase } from "../configs/supabase-config";
 import { isValid } from "../utils";
+import axios from "axios";
 
 export const channel = {
     subscribe: async (updateData) => {
@@ -70,7 +72,7 @@ export const channel = {
 
         return { success: true, ...status };
     },
-    
+
     unsubscribe: async (user_id, uploader_id) => {
         let status = {
             unsubscribed: false,
@@ -136,6 +138,33 @@ export const channel = {
         }
 
         return { success: true, subscribed: false }
-    }
+    },
+
+    getChannel: async (uploader_id) => {
+        try {
+            let res = await axios.get(`${config.baseUrl}/channel/${uploader_id}`);
+            if (res.status === 200) {
+                return { success: true, data: res.data }
+            }
+        } catch (error) {
+            console.log("Failed while getting channel data", error);
+            return { success: false, error: error }
+        }
+    },
+
+    getNextPage: async (uploader_id, nextpage) => {
+        let url = `${config.baseUrl}/nextpage/channel/${uploader_id}?nextpage=${(nextpage)}`;
+        
+        try {
+            let res = await axios.get(url);
+            if (res.status === 200) {
+                return { success: true, data: res.data }
+            }
+        } catch (error) {
+            console.log("Failed while getting more streams");
+            return { success: false, error: error }
+        }
+    },
+
 };
 
