@@ -41,14 +41,14 @@ export const Watch = () => {
     const handleVideoId = async () => {
         let res = await pipePlus.stream.get(streamId);
         const { videoStreams } = res;
-        
+
         // TODO : remove this in future        
         let signleStreams = videoStreams.filter((item) => {
             // filter out/remove streams with audio 
             return item.videoOnly === false && item.mimeType === "video/mp4";
         })
         res.videoStreams = signleStreams;
-        
+
         // prepare stream resources 
         let listOfStreams = {};
 
@@ -167,7 +167,7 @@ export const Watch = () => {
 
         let res = await pipePlus.channel.subscribe(data);
 
-        if(res.subscribed === true) {
+        if (res.subscribed === true) {
             setIsSubscribed(true);
         }
     }
@@ -179,7 +179,7 @@ export const Watch = () => {
 
         let res = await pipePlus.channel.unsubscribe(user.id, uploader_id);
 
-        if(res.unsubscribed === true) {
+        if (res.unsubscribed === true) {
             setIsSubscribed(false);
         }
     }
@@ -337,7 +337,7 @@ export const Watch = () => {
         let uploader_id = channelUrl.split("/").pop();
         let res = await pipePlus.channel.isSubscribed(user.id, uploader_id);
 
-        if(res.subscribed === true) {
+        if (res.subscribed === true) {
             setIsSubscribed(true);
         }
     }
@@ -372,27 +372,29 @@ export const Watch = () => {
                     {
                         isDescriptionOpen === false &&
                         <div className="flex flex-col gap-1 lg:flex-row w-full justify-between items-center">
-                            <div className="py-2 w-full flex gap-3 justify-start items-center">
-                                <img loading="lazy" src={uploaderAvatar} className="rounded-full w-7 h-7" />
-                                <div className="flex w-full justify-between items-center">
-                                    <div className="flex gap-2 lg:flex-col justify-center items-center">
-                                        <div className="flex items-center gap-2">
-                                            <p className="text-slate-200 font-bold lg:text-sm items-baseline line-clamp-1">{uploader} </p>
-                                            <TiTick className="bg-slate-50 bg-opacity-50 rounded-full text-xs hidden lg:flex" />
+                            <div className="py-2 w-full flex justify-between items-center">
+                                <Link to={`${uploaderUrl}`}>
+                                    <div className="flex gap-3 w-full justify-between items-center">
+                                        <img loading="lazy" src={uploaderAvatar} className="rounded-full w-7 h-7" />
+                                        <div className="flex gap-2 lg:flex-col justify-center items-center">
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-slate-200 font-bold lg:text-sm items-baseline line-clamp-1">{uploader} </p>
+                                                <TiTick className="bg-slate-50 bg-opacity-50 rounded-full text-xs hidden lg:flex" />
+                                            </div>
+                                            <span className="text-opacity-50 lg:text-opacity-100 text-slate-200 text-sm flex"><p className="p-2">{formatNumbers(uploaderSubscriberCount)}</p> <p className="hidden lg:flex">subscribers</p></span>
                                         </div>
-                                        <span className="text-opacity-50 lg:text-opacity-100 text-slate-200 text-sm flex"><p className="p-2">{formatNumbers(uploaderSubscriberCount)}</p> <p className="hidden lg:flex">subscribers</p></span>
                                     </div>
-                                    {
-                                        isSubscribed === true ?
-                                            <Button className="text-sm" onClick={() => handleChannelUnSubscribe()}>
-                                                Unsubscribe
-                                            </Button>
-                                            :
-                                            <Button type="white" className="bg-slate-100 text-black text-sm" onClick={() => handleChannelSubscribe()}>
-                                                Subscribe
-                                            </Button>
-                                    }
-                                </div>
+                                </Link>
+                                {
+                                    isSubscribed === true ?
+                                        <Button className="text-sm" onClick={() => handleChannelUnSubscribe()}>
+                                            Unsubscribe
+                                        </Button>
+                                        :
+                                        <Button type="white" className="bg-slate-100 text-black text-sm" onClick={() => handleChannelSubscribe()}>
+                                            Subscribe
+                                        </Button>
+                                }
                             </div>
                             <div className="flex w-full justify-between lg:gap-4">
                                 <Button className="text-sm lg:text-xl">
