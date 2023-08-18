@@ -140,7 +140,7 @@ export const channel = {
         return { success: true, subscribed: false }
     },
 
-    getChannel: async (uploader_id) => {
+    metadata: async (uploader_id) => {
         try {
             let res = await axios.get(`${config.baseUrl}/channel/${uploader_id}`);
             if (res.status === 200) {
@@ -152,9 +152,9 @@ export const channel = {
         }
     },
 
-    getNextPage: async (uploader_id, nextpage) => {
+    nextPage: async (uploader_id, nextpage) => {
         let url = `${config.baseUrl}/nextpage/channel/${uploader_id}?nextpage=${(nextpage)}`;
-        
+
         try {
             let res = await axios.get(url);
             if (res.status === 200) {
@@ -166,5 +166,20 @@ export const channel = {
         }
     },
 
+    tabsData: async (data) => {
+        let url = `${config.baseUrl}/channels/tabs?data=${data}`;
+
+        try {
+            let res = await axios.get(url);
+            if (res.status === 200) {
+                return { success: true, data: res.data }
+            }
+        } catch (error) {
+            console.log("Failed while getting shorts");
+            return { success: false, error: error }
+        }
+    },
+
+    
 };
 
