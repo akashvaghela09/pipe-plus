@@ -12,7 +12,6 @@ export const Subscriptions = () => {
     const { authStatus, user } = useSelector((state) => state.auth);
     const [feedStreams, setFeedStreams] = useState(null);
     const [userSubList, setUserSubList] = useState([]);
-
     const { pageLoading } = useSelector((state) => state.app);
 
     const fetchUserFeed = async () => {
@@ -57,7 +56,7 @@ export const Subscriptions = () => {
     }, [authStatus])
 
     return (
-        <div className="h-full w-full flex">
+        <div className="h-full w-full flex flex-col">
             {
                 sidepanelOpen && <div className="w-[300px] hidden sm:border-spacing-0 md:flex" />
             }
@@ -74,12 +73,14 @@ export const Subscriptions = () => {
                                         </div></Link>
                                 })
                             }
-
                         </div>
                     }
-                    <div className="absolute bottom-0 right-0 h-16 p-2 bg-[#0f0f0f] flex justify-center items-center">
-                        <p className="text-2xl text-bold text-[#3EA6FF]">All</p>
-                    </div>
+
+                    <Link to="/subscriptions-list">
+                        <div className="absolute bottom-0 right-0 h-16 p-2 bg-[#0f0f0f] flex justify-center items-center">
+                            <p className="text-2xl text-bold text-[#3EA6FF]">All</p>
+                        </div>
+                    </Link>
                 </div>
                 {
                     feedStreams && feedStreams.length > 0 && feedStreams.map((item) => {
@@ -88,21 +89,21 @@ export const Subscriptions = () => {
                         </Link>
                     })
                 }
-
-                {
-                    pageLoading === false && feedStreams && feedStreams.length === 0 &&
-                    <div className="w-full h-full flex justify-center items-center">
-                        <h1 className="text-2xl font-bold text-slate-100">No new videos</h1>
-                    </div>
-                }
-
-                {
-                    pageLoading === true &&
-                    <div className="h-screen w-full flex justify-center items-center">
-                        <Spinner />
-                    </div>
-                }
             </div>
+
+            {
+                pageLoading === false && feedStreams && feedStreams.length === 0 &&
+                <div className="w-full h-full flex justify-center items-center">
+                    <h1 className="text-2xl font-bold text-slate-100">No new videos</h1>
+                </div>
+            }
+
+            {
+                pageLoading === true &&
+                <div className="h-screen w-full flex justify-center items-center">
+                    <Spinner />
+                </div>
+            }
         </div>
     )
 }
