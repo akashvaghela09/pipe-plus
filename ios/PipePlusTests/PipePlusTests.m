@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface pipeplusTests : XCTestCase
+@interface PipePlusTests : XCTestCase
 
 @end
 
-@implementation pipeplusTests
+@implementation PipePlusTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {
