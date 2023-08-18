@@ -180,6 +180,18 @@ export const channel = {
         }
     },
 
-    
+    tabsNextPage: async (data, nextpage) => {
+        let url = `${config.baseUrl}/channels/tabs?data=${data}&nextpage=${nextpage}`;
+
+        try {
+            let res = await axios.get(url);
+            if (res.status === 200) {
+                return { success: true, data: res.data }
+            }
+        } catch (error) {
+            console.log("Failed while getting shorts");
+            return { success: false, error: error }
+        }
+    }
 };
 
