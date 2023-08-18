@@ -1,7 +1,8 @@
 import { 
     SET_SIDE_PANEL_VALUE,
     SET_DEVICE_TYPE,
-    SET_PAGE_LOADING
+    SET_PAGE_LOADING,
+    SET_SUBSCRIPTION_STATUS,
 } from './actionTypes';
 
 export const setSidePanelValue = (payload) => {
@@ -21,6 +22,13 @@ export const setDeviceType = (payload) => {
 export const setPageLoading = (payload) => {
     return {
         type: SET_PAGE_LOADING,
+        payload
+    }
+}
+
+export const setSubscriptionStatus = (payload) => {
+    return {
+        type: SET_SUBSCRIPTION_STATUS,
         payload
     }
 }
