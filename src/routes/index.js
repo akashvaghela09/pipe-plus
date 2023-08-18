@@ -14,6 +14,7 @@ export { Results } from "./Results.jsx";
 export { Settings } from "./Settings.jsx";
 export { Shorts } from "./Shorts.jsx";
 export { Subscriptions } from "./Subscriptions.jsx";
+export { SubscriptionsList } from "./SubscriptionsList.jsx";
 export { Trending } from "./Trending.jsx";
 export { Watch } from "./Watch.jsx";
 export { WatchLater } from "./WatchLater.jsx";

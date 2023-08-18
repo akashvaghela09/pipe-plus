@@ -67,6 +67,7 @@ function App() {
     "/",
     "/trending",
     "/subscriptions",
+    "/subscriptions-list",
     "/channel-groups",
     "/library",
     "/watch",

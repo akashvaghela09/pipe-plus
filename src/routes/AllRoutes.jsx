@@ -18,7 +18,8 @@ import {
     Subscriptions, 
     Watch, 
     WatchLater, 
-    Trending
+    Trending,
+    SubscriptionsList
 } from './';
 import { PrivateRoute } from './PrivateRoute';
 
@@ -30,6 +31,7 @@ export const AllRoutes = () => {
                 <Route path='/' element={<Home />} />
                 <Route path='/shorts' element={<Shorts />} />
                 <Route path='/subscriptions' element={<Subscriptions />} />
+                <Route path='/subscriptions-list' element={<SubscriptionsList />} />
                 <Route path='/channel-groups' element={<ChannelGroups />} />
                 
                 {/* Secondary Pages */}
