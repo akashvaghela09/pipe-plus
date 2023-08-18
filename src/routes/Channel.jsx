@@ -1,15 +1,16 @@
 import { useEffect, useState, useRef } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { pipePlus } from "../apis";
 import { TiTick } from "react-icons/ti";
 import { formatNumbers, formatTime, isValid, waitFor } from "../utils";
-import { Spinner } from "../components";
+import { Button, Spinner } from "../components";
 import { useDispatch, useSelector } from "react-redux";
-import { setPageLoading } from "../redux/app/actions";
+import { setPageLoading, setSubscriptionStatus } from "../redux/app/actions";
 import { v4 as uuid } from 'uuid';
 
 export const Channel = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { channelId } = useParams();
     const [channel, setChannel] = useState(null);
     const [tab, setTab] = useState("videos");
@@ -19,7 +20,8 @@ export const Channel = () => {
 
     const videoSectionRef = useRef(null);
 
-    const { pageLoading } = useSelector(state => state.app);
+    const { pageLoading, subscriptionStatus } = useSelector(state => state.app);
+    const { user, authStatus } = useSelector(state => state.auth);
 
     const fetchChannelData = async () => {
         dispatch(setPageLoading(true));
@@ -57,7 +59,6 @@ export const Channel = () => {
             dispatch(setPageLoading(false));
             return;
         }
-
 
         if (channel === null) {
             setChannel(res.data);
@@ -139,7 +140,6 @@ export const Channel = () => {
             return;
         }
 
-        console.log("assigning uuid ...");
         let list = res.data.relatedStreams.map(item => {
             item.id = uuid();
             return item;
@@ -176,6 +176,63 @@ export const Channel = () => {
         setFeaturedChannels([]);
     }
 
+    const fetchSubscriptionStatus = async () => {
+        let res = await pipePlus.channel.isSubscribed(user.id, channelId);
+
+        if (!res.success) {
+            return;
+        }
+
+        let { subscribed } = res;
+
+        dispatch(setSubscriptionStatus(subscribed));
+    }
+
+    const handleChannelSubscribe = async () => {
+        validate();
+
+        if(channel === null || !isValid(user?.id)) {
+            return;
+        }
+
+        let data = {
+            created_at: new Date(),
+            uuid: uuid(),
+            uploader_id: channel.id,
+            name: channel.name,
+            avatar: channel.avatarUrl,
+            feed_allowed: true,
+            user_id: user.id
+        }
+
+        let res = await pipePlus.channel.subscribe(data);
+
+        if (res.subscribed === true) {
+            dispatch(setSubscriptionStatus(true));
+        }
+    }
+
+    const handleChannelUnSubscribe = async () => {
+        validate();
+
+        if(channel === null || !isValid(user?.id)) {
+            return;
+        }
+
+        let res = await pipePlus.channel.unsubscribe(user.id, channel.id);
+
+        if (res.unsubscribed === true) {
+            dispatch(setSubscriptionStatus(false));
+        }
+    }
+
+    const validate = async () => {
+        if (!authStatus) {
+            alert("Please login to subscribe to this channel")
+            navigate('/signin');
+        }
+    }
+
     useEffect(() => {
         const handleScroll = async () => {
             const videoSectionElement = videoSectionRef?.current;
@@ -204,7 +261,12 @@ export const Channel = () => {
         setChannel(null);
         resetData();
         fetchChannelData();
+        fetchSubscriptionStatus();
     }, [channelId]);
+
+    useEffect(() => {
+        fetchSubscriptionStatus();
+    }, [user.id]);
 
     useEffect(() => {
         fetchChannelData();
@@ -228,7 +290,18 @@ export const Channel = () => {
                 </span>
                 <p className="text-slate-100 text-opacity-50 text-sm mt-2">{formatNumbers(channel.subscriberCount)} subscribers</p>
                 <p className="text-slate-100 text-opacity-50 line-clamp-2 m-2 text-sm text-center">{channel.description}</p>
-
+                <div className="p-2 w-full">
+                    {
+                        subscriptionStatus === true ?
+                            <Button onClick={() => handleChannelUnSubscribe()} className="w-full">
+                                Unsubscribe
+                            </Button>
+                            :
+                            <Button onClick={() => handleChannelSubscribe()} type="white" className="w-full">
+                                Subscribe
+                            </Button>
+                    }
+                </div>
                 <div className="mt-2 w-full">
                     <div className="flex">
                         <p className={`cursor-pointer w-fit py-2 px-3 text-slate-100 active:bg-slate-100 active:bg-opacity-30 ${tab === "videos" && "border-b-4 border-slate-100 border-opacity-50"}`} onClick={() => handleTabChange("videos")}>Videos</p>
