@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     streamUrl: "",
+    hlsUrl: "",
     isPlaying: false,
     isFullScreen: false,
     isVisible: false,
@@ -11,7 +12,7 @@ const initialState = {
     relatedStreams: [],
     availableQualities: [],
     streamQuality: "720p",
-    rawData: {}
+    streamMetadata: {}
 };
 
 const playerSlice = createSlice({
@@ -20,6 +21,9 @@ const playerSlice = createSlice({
     reducers: {
         setStreamUrl: (state, action) => {
             state.streamUrl = action.payload;
+        },
+        setHlsUrl: (state, action) => {
+            state.hlsUrl = action.payload;
         },
         setIsPlaying: (state, action) => {
             state.isPlaying = action.payload;
@@ -45,8 +49,8 @@ const playerSlice = createSlice({
         setStreamQuality: (state, action) => {
             state.streamQuality = action.payload;
         },
-        setRawData: (state, action) => {
-            state.rawData = action.payload;
+        setStreamMetadata: (state, action) => {
+            state.streamMetadata = action.payload;
         },
         setLoading: (state, action) => {
             state.isLoading = action.payload;
@@ -56,6 +60,7 @@ const playerSlice = createSlice({
 
 export const { 
     setStreamUrl, 
+    setHlsUrl,
     setIsPlaying, 
     setIsFullScreen, 
     setIsVisible ,
@@ -64,7 +69,7 @@ export const {
     setRelatedStreams,
     setAvailableQualities,
     setStreamQuality,
-    setRawData,
+    setStreamMetadata,
     setLoading
 } = playerSlice.actions;
 
