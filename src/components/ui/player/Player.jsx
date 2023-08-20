@@ -1,12 +1,13 @@
-import { useEffect, useState, useRef, useCallback, useMemo, } from 'react';
-import { ScrollView, View, Text, StyleSheet, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native';
+import { useEffect, useState, useRef } from 'react';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { IconButton, TouchableRipple } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setSettingsOpen } from '../../../redux/player/playerSlice';
 import Video from 'react-native-video';
-import { BackHandler, Alert } from 'react-native';
+import { BackHandler } from 'react-native';
 import Slider from '@react-native-community/slider';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { formatTime } from '../../../utils';
 
 export const Player = ({ navigator }) => {
     const dispatch = useDispatch();
@@ -16,11 +17,12 @@ export const Player = ({ navigator }) => {
     const [buffered, setBuffered] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [isSliderVisible, setSliderVisible] = useState(true);
+    const [isSliderVisible, setSliderVisible] = useState(false);
     const lastTap = useRef(null);
     const videoRef = useRef(null);
     const [isRippleVisible, setRippleVisible] = useState(false);
     const [seekSide, setSeekSide] = useState(null);
+    const [sliderTimer, setSliderTimer] = useState(null);
 
     const resetData = () => {
         dispatch(setIsVisible(false));
@@ -50,45 +52,54 @@ export const Player = ({ navigator }) => {
     }
 
     const handleSeek = (value) => {
-        // setIsPaused(true);
-        // setCurrentTime(value);
         videoRef.current.seek(value);
-        // setIsPaused(false);
     };
 
     const handlePlayerReady = (e) => {
-        // console.log("Player is ready to play stream");
         setIsPaused(false);
         setDuration(e.duration);
     }
 
-    const handlePlayback = (playback) => {
-        if (isPaused === false) {
-            setIsPaused(true);
+    const startSliderTimer = () => {
+        if (sliderTimer) {
+            clearTimeout(sliderTimer); // clear the existing timer
         }
-        else {
-            setIsPaused(false);
+    
+        const timer = setTimeout(() => {
+            setSliderVisible(false);
+        }, 5000); // hide after 5 seconds
+    
+        setSliderTimer(timer);
+    };
+    
+    const handleTap = () => {
+        if(isSliderVisible === false) {
+            setSliderVisible(true);
+        } else {
+            startSliderTimer(); // reset the timer if the user taps while the slider is already visible
         }
-    }
-
+    };
+    
     const handleDoubleTap = (side) => {
         const now = Date.now();
+    
         if (lastTap.current && (now - lastTap.current) < 300) {
             setRippleVisible(true);
             setTimeout(() => setRippleVisible(false), 500); // hide ripple after 500ms
+    
             if (side === 'left') {
                 handleSeek(currentTime - 15);
-                setSeekSide('left')
+                setSeekSide('left');
             } else {
                 handleSeek(currentTime + 15);
-                setSeekSide('right')
+                setSeekSide('right');
             }
+    
+            // Reset lastTap to null after detecting double tap
+            lastTap.current = null;
+            startSliderTimer(); // reset the timer if the user double taps
         } else {
-            setRippleVisible(false);
-            setSeekSide(null);
             lastTap.current = now;
-
-            setSliderVisible(!isSliderVisible)
         }
     };
 
@@ -98,9 +109,6 @@ export const Player = ({ navigator }) => {
 
     useEffect(() => {
         const backAction = () => {
-            console.log("isVisible", isVisible);
-            console.log("size", size);
-
             if (size === "normal") {
                 dispatch(setSize("small"));
                 return true;
@@ -110,7 +118,6 @@ export const Player = ({ navigator }) => {
             } else if (isVisible === false) {
                 console.log("exit app");
             }
-
         };
 
         const backHandler = BackHandler.addEventListener(
@@ -123,12 +130,14 @@ export const Player = ({ navigator }) => {
 
     useEffect(() => {
         if (isSliderVisible === true) {
-            const timer = setTimeout(() => {
-                setSliderVisible(false);
-            }, 3000); // hide after 5 seconds
-
-            return () => clearTimeout(timer); // clear the timer if the component is unmounted or if the effect runs again
+            startSliderTimer();
         }
+        
+        return () => {
+            if (sliderTimer) {
+                clearTimeout(sliderTimer); // clear the timer if the component is unmounted or if the effect runs again
+            }
+        };
     }, [isSliderVisible]);
 
     return (
@@ -138,7 +147,7 @@ export const Player = ({ navigator }) => {
                 <ScrollView style={{ borderWidth: 1, width: "100%" }} className="bg-blue-300 flex flex-col">
                     <TouchableOpacity
                         activeOpacity={1} // maintain full opacity
-                        onPress={() => setSliderVisible(!isSliderVisible)}
+                        onPress={handleTap}
                     >
                         <View style={styles.videoWrapper}>
                             <Video
@@ -156,7 +165,7 @@ export const Player = ({ navigator }) => {
                             />
 
                             {
-                                size === "normal" &&
+                                size === "normal" && isSliderVisible &&
                                 <>
                                     {/* Controls Wrapper */}
                                     <View className="absolute top-0 left-0 h-full w-full" style={styles.controlWrapper}>
@@ -231,6 +240,10 @@ export const Player = ({ navigator }) => {
                                             style={{ ...styles.slider }}
                                         />
                                     </View>
+                                    <View style={{ flexDirection: "row", width: "fit-content", position: 'absolute', bottom: 25, left: 20 }}>
+                                        <Text style={{ fontSize: 12 }}>{formatTime(currentTime)}</Text>
+                                        <Text style={{ opacity: 0.7, fontSize: 12 }}>  / {formatTime(duration)}</Text>
+                                    </View>
                                 </>
                             }
                         </View>
@@ -252,6 +265,7 @@ const styles = StyleSheet.create({
         width: '100%',
         aspectRatio: 16 / 9,
         borderColor: '#fff',
+        backgroundColor: '#000',
     },
     videoSmall: {
         width: 100,
