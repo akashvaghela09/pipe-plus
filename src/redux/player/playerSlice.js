@@ -5,8 +5,13 @@ const initialState = {
     isPlaying: false,
     isFullScreen: false,
     isVisible: false,
+    isLoading: false,
     size: "normal",
     settingsOpen: false,
+    relatedStreams: [],
+    availableQualities: [],
+    streamQuality: "720p",
+    rawData: {}
 };
 
 const playerSlice = createSlice({
@@ -30,6 +35,21 @@ const playerSlice = createSlice({
         },
         setSettingsOpen: (state, action) => {
             state.settingsOpen = action.payload;
+        },
+        setRelatedStreams: (state, action) => {
+            state.relatedStreams = action.payload;
+        },
+        setAvailableQualities: (state, action) => {
+            state.availableQualities = action.payload;
+        },
+        setStreamQuality: (state, action) => {
+            state.streamQuality = action.payload;
+        },
+        setRawData: (state, action) => {
+            state.rawData = action.payload;
+        },
+        setLoading: (state, action) => {
+            state.isLoading = action.payload;
         }
     },
 });
@@ -40,7 +60,12 @@ export const {
     setIsFullScreen, 
     setIsVisible ,
     setSize,
-    setSettingsOpen
+    setSettingsOpen,
+    setRelatedStreams,
+    setAvailableQualities,
+    setStreamQuality,
+    setRawData,
+    setLoading
 } = playerSlice.actions;
 
 export default playerSlice.reducer;
