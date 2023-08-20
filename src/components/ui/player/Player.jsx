@@ -78,6 +78,9 @@ export const Player = ({ navigator }) => {
     const handleTap = () => {
         if (isSliderVisible === false) {
             setSliderVisible(true);
+            if(size === "small") {
+                dispatch(setSize("normal"));
+            }   
         } else {
             startSliderTimer(); // reset the timer if the user taps while the slider is already visible
         }
@@ -288,7 +291,6 @@ const styles = StyleSheet.create({
         width: '100%',
         aspectRatio: 16 / 9,
         backgroundColor: '#000',
-        zIndex: 100,
     },
     videoSmall: {
         width: 100,
