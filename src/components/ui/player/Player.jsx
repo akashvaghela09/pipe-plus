@@ -230,6 +230,14 @@ export const Player = ({ navigator }) => {
                                                     onPress={() => alert("Fullscreen")}
                                                 />
 
+                                                {/* Close button */}
+                                                <IconButton
+                                                    icon={"close"}
+                                                    size={25}
+                                                    style={{ position: 'absolute', top: 0, left: 5 }}
+                                                    onPress={() => setSliderVisible(false)}
+                                                />
+
                                                 {/* Settings button */}
                                                 <IconButton
                                                     icon={"cog-outline"}
