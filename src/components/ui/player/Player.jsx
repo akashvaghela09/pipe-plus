@@ -8,10 +8,11 @@ import { BackHandler } from 'react-native';
 import Slider from '@react-native-community/slider';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { formatTime } from '../../../utils';
+import { VideoCard } from '../VideoCard';
 
 export const Player = ({ navigator }) => {
     const dispatch = useDispatch();
-    const { isFullScreen, isVisible, streamUrl, size, isPlaying, isLoading } = useSelector(state => state.player);
+    const { isFullScreen, isVisible, streamUrl, size, isPlaying, isLoading, relatedStreams } = useSelector(state => state.player);
     const [played, setPlayed] = useState(0);
     const [buffered, setBuffered] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
@@ -113,8 +114,10 @@ export const Player = ({ navigator }) => {
         const backAction = () => {
             if (size === "normal") {
                 dispatch(setSize("small"));
+                console.log("minimize app");
                 return true;
             } else if (size === "small" && isVisible === true) {
+                console.log("close modal");
                 resetData();
                 return true;
             } else if (isVisible === false) {
@@ -145,11 +148,11 @@ export const Player = ({ navigator }) => {
     return (
         isVisible &&
         <TouchableOpacity activeOpacity={size === "small" ? 0.7 : 1} onPress={() => handlePlayerClick()}>
-            <View className={`bg-slate-400 flex justify-center items-center ${size === "normal" && "h-screen w-full"}`}>
-                <ScrollView style={{ borderWidth: 1, width: "100%" }} className="bg-blue-300 flex flex-col">
+            <View className={`bg-[#0f0f0f] flex justify-center items-center ${size === "normal" && "h-screen w-full"}`}>
+                <ScrollView style={{ width: "100%" }} className="flex flex-col">
                     {
                         isLoading ?
-                            <View style={{ width: "100%", aspectRatio: 16 / 9, backgroundColor: "white", flex: 1, justifyContent: "center", alignItems: "center" }}>
+                            <View className="flex justify-center items-center bg-[#212121]" style={{ borderWidth: 1, width: "100%", aspectRatio: 16 / 9 }}>
                                 <ActivityIndicator size="large" animating={true} color="red" />
                             </View>
                             :
@@ -257,6 +260,17 @@ export const Player = ({ navigator }) => {
                                 </View>
                             </TouchableOpacity>
                     }
+
+                    {/* Related streams */}
+                    {
+                        size === "normal" &&
+                        relatedStreams.length > 0 &&
+                        relatedStreams.map((stream, index) => {
+                            return (
+                                <VideoCard key={index} video={stream} />
+                            )
+                        })
+                    }
                 </ScrollView>
             </View>
         </TouchableOpacity>
@@ -273,8 +287,8 @@ const styles = StyleSheet.create({
     videoNormal: {
         width: '100%',
         aspectRatio: 16 / 9,
-        borderColor: '#fff',
         backgroundColor: '#000',
+        zIndex: 100,
     },
     videoSmall: {
         width: 100,
@@ -310,7 +324,6 @@ const styles = StyleSheet.create({
     },
     progressWrapper: {
         height: 3,
-        borderColor: 'blue',
         position: 'absolute',
         bottom: 0,
         width: '100%',
