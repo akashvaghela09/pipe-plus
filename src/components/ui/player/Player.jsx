@@ -149,7 +149,7 @@ export const Player = ({ navigator }) => {
         isVisible &&
         <TouchableOpacity activeOpacity={size === "small" ? 0.7 : 1} onPress={() => handlePlayerClick()}>
             <View className={`bg-[#0f0f0f] flex justify-center items-center ${size === "normal" && "h-screen w-full"}`}>
-                <ScrollView style={{ width: "100%" }} className="flex flex-col">
+                <ScrollView stickyHeaderIndices={[0]} style={{ width: "100%" }} className="flex flex-col">
                     {
                         isLoading ?
                             <View className="flex justify-center items-center bg-[#212121]" style={{ borderWidth: 1, width: "100%", aspectRatio: 16 / 9 }}>
