@@ -155,8 +155,8 @@ export const Player = ({ navigator }) => {
                 <ScrollView stickyHeaderIndices={[0]} style={{ width: "100%" }} className="flex flex-col">
                     {
                         isLoading ?
-                            <View className="flex justify-center items-center bg-[#212121]" style={{ borderWidth: 1, width: "100%", aspectRatio: 16 / 9 }}>
-                                <ActivityIndicator size="large" animating={true} color="red" />
+                            <View className="flex justify-center items-center bg-[#212121]" style={{ borderWidth: 1, width: size === "normal" ? "100%" : 100, aspectRatio: 16 / 9 }}>
+                                <ActivityIndicator size={size === "normal" ? "large" : "small"} animating={true} color="red" />
                             </View>
                             :
                             <TouchableOpacity
