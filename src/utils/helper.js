@@ -27,3 +27,33 @@ export const shuffleArray = (array) => {
     }
     return array;
 }
+
+export const cleanNextPageToken = (nextPageToken) => {
+    if (!isValid(nextPageToken)) return null;
+
+    let parsedJson = JSON.parse(nextPageToken);
+    let nextPageUrl = parsedJson.url.split("&")[0];
+    parsedJson.url = nextPageUrl;
+
+    return JSON.stringify(parsedJson);
+};
+
+// This function is used to filter out duplicate objects from an array of objects
+// Input params:
+// arr: array of objects
+// key: key of the object to be used for filtering
+export const filterUniqueObj = (arr, key) => {
+    if (!key) return [];
+
+    const seenValues = new Set();
+    const filteredList = [];
+
+    arr.forEach(obj => {
+        if (!seenValues.has(obj[key])) {
+            seenValues.add(obj[key]);
+            filteredList.push(obj);
+        }
+    });
+
+    return filteredList;
+}
