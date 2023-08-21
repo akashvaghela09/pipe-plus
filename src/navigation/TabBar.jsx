@@ -8,6 +8,10 @@ import { useSelector } from 'react-redux';
 
 export const TabBar = ({ state, descriptors, navigation }) => {
 
+    const stackIndex = state.routes[state.index].state?.index;
+    const stackRoute = state.routes[state.index]?.state?.routes[stackIndex];
+    const stackRouteName = stackRoute?.name;
+
     const { settingsOpen } = useSelector(state => state.player);
 
     return (
@@ -41,6 +45,10 @@ export const TabBar = ({ state, descriptors, navigation }) => {
                             navigation.navigate(route.name);
                         }
                     };
+
+                    if (stackRouteName === "search") {
+                        return null;
+                    }
 
                     return (
                         <TouchableRipple
