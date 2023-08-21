@@ -12,7 +12,22 @@ const initialState = {
     relatedStreams: [],
     availableQualities: [],
     streamQuality: "720p",
-    streamMetadata: {}
+    streamMetadata: {
+        streamId: "",
+        isShort: false,
+        shortDescription: "",
+        thumbnail: "",
+        title: "",
+        type: "",
+        uploaded: 0,
+        uploadedDate: "",
+        uploaderAvatar: "",
+        uploaderName: "",
+        uploaderUrl: "",
+        uploaderVerified: false,
+        views: 0,
+        uploaderSubscriberCount: 0
+    }
 };
 
 const playerSlice = createSlice({
@@ -58,12 +73,12 @@ const playerSlice = createSlice({
     },
 });
 
-export const { 
-    setStreamUrl, 
+export const {
+    setStreamUrl,
     setHlsUrl,
-    setIsPlaying, 
-    setIsFullScreen, 
-    setIsVisible ,
+    setIsPlaying,
+    setIsFullScreen,
+    setIsVisible,
     setSize,
     setSettingsOpen,
     setRelatedStreams,

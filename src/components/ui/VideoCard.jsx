@@ -9,6 +9,25 @@ export const VideoCard = ({ video }) => {
     const dispatch = useDispatch();
 
     const handleStreamPlay = async () => {
+
+        let initMetaData = {
+            streamId: "",
+            isShort: false,
+            shortDescription: "",
+            thumbnail: "",
+            title: "",
+            type: "",
+            uploaded: 0,
+            uploadedDate: "",
+            uploaderAvatar: "",
+            uploaderName: "",
+            uploaderUrl: "",
+            uploaderVerified: false,
+            views: 0,
+            uploaderSubscriberCount: 0
+        }
+
+        dispatch(setStreamMetadata(initMetaData));
         dispatch(setLoading(true));
         dispatch(setStreamUrl(""));
         dispatch(setSize("normal"));
@@ -32,28 +51,28 @@ export const VideoCard = ({ video }) => {
             views: video.views,
         }
 
-        dispatch(setStreamMetadata(stream));
-
         let validQuality = [];
         let validUrl = "";
         let hlsUrl = "";
 
         let res = await axios.get(`${config.baseUrl}/streams/${stream.streamId}`);
 
-        if(!isValid(res.data)) {
+        if (!isValid(res.data)) {
             console.log("Stream data is invalid");
             return;
         }
 
         res.data.videoStreams.forEach((item) => {
-            if(item.mimeType === "video/mp4" && item.videoOnly === false) {
+            if (item.mimeType === "video/mp4" && item.videoOnly === false) {
                 validQuality.push(item);
             }
         });
 
         validUrl = validQuality[0].url;
         hlsUrl = res.data.url;
+        stream.uploaderSubscriberCount = res.data.uploaderSubscriberCount;
 
+        dispatch(setStreamMetadata(stream));
         dispatch(setStreamUrl(validUrl));
         dispatch(setHlsUrl(hlsUrl));
         dispatch(setAvailableQualities(validQuality));
