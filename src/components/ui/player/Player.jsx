@@ -1,18 +1,38 @@
 import { useEffect, useState, useRef } from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { ActivityIndicator, IconButton, TouchableRipple } from 'react-native-paper';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, Button as RNButton } from 'react-native';
+import { ActivityIndicator, Button, IconButton, TouchableRipple } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setSettingsOpen } from '../../../redux/player/playerSlice';
 import Video from 'react-native-video';
 import { BackHandler } from 'react-native';
 import Slider from '@react-native-community/slider';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { formatTime } from '../../../utils';
+import { formatNumbers, formatReadableDate, formatTime } from '../../../utils';
 import { VideoCard } from '../VideoCard';
 
 export const Player = ({ navigator }) => {
     const dispatch = useDispatch();
-    const { isFullScreen, isVisible, streamUrl, size, isPlaying, isLoading, relatedStreams } = useSelector(state => state.player);
+
+    const {
+        isFullScreen,
+        isVisible,
+        streamUrl,
+        size,
+        isPlaying,
+        isLoading,
+        relatedStreams,
+        streamMetadata
+    } = useSelector(state => state.player);
+
+    const {
+        title,
+        views,
+        uploaded,
+        uploadedDate,
+        uploaderName,
+        uploaderSubscriberCount
+    } = streamMetadata;
+
     const [played, setPlayed] = useState(0);
     const [buffered, setBuffered] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
@@ -78,9 +98,9 @@ export const Player = ({ navigator }) => {
     const handleTap = () => {
         if (isSliderVisible === false) {
             setSliderVisible(true);
-            if(size === "small") {
+            if (size === "small") {
                 dispatch(setSize("normal"));
-            }   
+            }
         } else {
             startSliderTimer(); // reset the timer if the user taps while the slider is already visible
         }
@@ -270,6 +290,29 @@ export const Player = ({ navigator }) => {
                                     }
                                 </View>
                             </TouchableOpacity>
+                    }
+
+                    {/* Video Metadata */}
+                    {
+                        size === "normal" &&
+                        title.length > 0 &&
+                        <View className="p-3 mb-4">
+                            <Text numberOfLines={2} style={{ fontSize: 16, fontWeight: 900, color: "white" }}>{title || ""}</Text>
+                            <Text className="my-2 text-xs">{formatNumbers(views)}    {formatReadableDate(uploaded)}</Text>
+                            <View className="flex flex-row items-center justify-between">
+                                <View className="flex flex-row">
+                                    <Image source={{ uri: streamMetadata.uploaderAvatar }} className="w-8 h-8 rounded-full" />
+                                    <View className="flex flex-row items-center mx-3">
+                                        <Text className="" style={{ fontSize: 16, fontWeight: 700, color: "white" }} numberOfLines={1}>{uploaderName || ""}</Text>
+                                        <Text className="mx-2">{formatNumbers(uploaderSubscriberCount)}</Text>
+                                    </View>
+                                </View>
+
+                                <Button mode='elevated' textColor='black' buttonColor='white'>
+                                    Subscribe
+                                </Button>
+                            </View>
+                        </View>
                     }
 
                     {/* Related streams */}
