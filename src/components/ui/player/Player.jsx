@@ -17,6 +17,7 @@ export const Player = ({ navigator }) => {
         isFullScreen,
         isVisible,
         streamUrl,
+        hlsUrl,
         size,
         isPlaying,
         isLoading,
@@ -185,6 +186,7 @@ export const Player = ({ navigator }) => {
                             >
                                 <View style={styles.videoWrapper}>
                                     <Video
+                                        // source={{ uri: hlsUrl }}
                                         source={{ uri: streamUrl }}
                                         ref={videoRef}
                                         style={size === "small" ? styles.videoSmall : styles.videoNormal}

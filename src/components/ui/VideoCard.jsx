@@ -69,7 +69,7 @@ export const VideoCard = ({ video }) => {
         });
 
         validUrl = validQuality[0].url;
-        hlsUrl = res.data.url;
+        hlsUrl = res.data.hls;
         stream.uploaderSubscriberCount = res.data.uploaderSubscriberCount;
 
         dispatch(setStreamMetadata(stream));
