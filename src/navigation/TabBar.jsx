@@ -13,6 +13,7 @@ export const TabBar = ({ state, descriptors, navigation }) => {
     const stackRouteName = stackRoute?.name;
 
     const { settingsOpen } = useSelector(state => state.player);
+    const { tabBarVisible } = useSelector(state => state.app);
 
     return (
         <>
@@ -46,7 +47,12 @@ export const TabBar = ({ state, descriptors, navigation }) => {
                         }
                     };
 
-                    if (stackRouteName === "search") {
+                    // Hide tab bar based on route name
+                    // if (stackRouteName === "search") {
+                    //     return null;
+                    // }
+
+                    if(!tabBarVisible){
                         return null;
                     }
 

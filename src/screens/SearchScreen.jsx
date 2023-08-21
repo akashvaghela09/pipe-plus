@@ -4,8 +4,11 @@ import { ScrollView, View, Text, TextInput, StyleSheet, TouchableOpacity } from 
 import { IconButton } from "react-native-paper";
 import { v4 as uuid } from 'uuid';
 import { config } from "../configs/config";
+import { useDispatch } from "react-redux";
+import { setTabBarVisible } from "../redux/app/appSlice";
 
 export const SearchScreen = ({ navigation }) => {
+    const dispatch = useDispatch();
     const [searchText, setSearchText] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [searchAutoFocus, setSearchAutoFocus] = useState(true);
@@ -22,7 +25,7 @@ export const SearchScreen = ({ navigation }) => {
         setSearchResults(data);
     }
 
-    const HandleSearchClear = () => {
+    const handleSearchClear = () => {
         setSearchText("");
         setSearchAutoFocus(true);
     }
@@ -35,7 +38,13 @@ export const SearchScreen = ({ navigation }) => {
         navigation.goBack();
     }
 
+    const handleTabBar = (value) => {
+        dispatch(setTabBarVisible(value));
+    }
+
     const handleSearchStream = () => {
+        handleTabBar(true);
+
         navigation.navigate('result', {
             query: searchText,
         });
@@ -57,6 +66,13 @@ export const SearchScreen = ({ navigation }) => {
         }
     }, [searchText]);
 
+    useEffect(() => {
+        handleTabBar(false);
+        return () => {
+            handleTabBar(true);
+        }
+    }, []);
+
     return (
         <ScrollView style={styles.wrapper}>
             <View className="flex flex-row items-center">
@@ -70,6 +86,7 @@ export const SearchScreen = ({ navigation }) => {
                     style={styles.input}
                     onSubmitEditing={handleSearchStream}
                     onChangeText={setSearchText}
+                    onFocus={() => handleTabBar(false)}
                     value={searchText}
                     autoFocus={searchAutoFocus}
                     returnKeyType="search"
@@ -81,7 +98,7 @@ export const SearchScreen = ({ navigation }) => {
                         icon="close"
                         color="#fff"
                         size={22}
-                        onPress={() => HandleSearchClear()}
+                        onPress={() => handleSearchClear()}
                         style={{ position: "absolute", right: 45, top: 2 }}
                     />
                 }

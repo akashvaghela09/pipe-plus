@@ -4,6 +4,7 @@ const initialState = {
   name: 'John Doe',
   age: null,
   count: 0,
+  tabBarVisible: true,
 };
 
 const appSlice = createSlice({
@@ -18,10 +19,18 @@ const appSlice = createSlice({
     },
     setCount: (state, action) => {
       state.count = action.payload;
+    },
+    setTabBarVisible: (state, action) => {
+      state.tabBarVisible = action.payload;
     }
   },
 });
 
-export const { setName, setAge, setCount } = appSlice.actions;
+export const { 
+  setName, 
+  setAge, 
+  setCount,
+  setTabBarVisible,
+} = appSlice.actions;
 
 export default appSlice.reducer;
