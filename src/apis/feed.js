@@ -1,6 +1,7 @@
 import { config } from "../configs/config";
 import axios from "axios";
 import { shuffleArray } from "../utils";
+import { v4 as uuid } from "uuid";
 
 export const feed = {
     trending: async (region) => {
@@ -11,9 +12,10 @@ export const feed = {
             data = [...res.data];
         } catch (error) {
             console.log("Failed while fetching trending data", error);
+            return { success: false, message: "Failed while fetching trending data" };
         }
 
-        return data;
+        return { success: true, data: data };
     },
 
     suggestions: async (query) => {
@@ -24,22 +26,65 @@ export const feed = {
             data = [...res?.data];
         } catch (error) {
             console.log("Failed while fetching suggestions", error);
+            return { success: false, message: "Failed while fetching suggestions" };
         }
 
-        return data;
+        return { success: true, data: data };
     },
 
     search: async (query, filter = "all") => {
-        let data = null;
+        let data = {
+            items: [],
+            nextpage: null
+        };
 
         try {
             let res = await axios.get(`${config.baseUrl}/search?q=${query}&filter=${filter}`);
-            data = { ...res.data };
+
+            // Filter out the channels and streams
+            // ** Note: The API returns a lot of other data like playlists, videos, etc. **
+            // ** Will add support for them later **
+            res?.data?.items.forEach((item) => {
+                if (item.type === "channel" || item.type === "stream") {
+                    data.items.push(item)
+                }
+            })
+
+            data.nextpage = res?.data?.nextpage;
         } catch (error) {
             console.log("Failed while fetching search data", error);
+            return { success: false, message: "Failed while fetching search data" };
         }
 
-        return data;
+        return { success: true, data: data };
+    },
+
+    searchNextPage: async (query, nextpage, filter = "all") => {
+        let data = {
+            items: [],
+            nextpage: null
+        };
+
+        try {
+            let res = await axios.get(`${config.baseUrl}/search?q=${query}&filter=${filter}?nextpage=${(nextpage)}`);
+
+            // Filter out the channels and streams
+            // ** Note: The API returns a lot of other data like playlists, videos, etc. **
+            // ** Will add support for them later **
+            res?.data?.items.forEach((item) => {
+                if (item.type === "channel" || item.type === "stream") {
+                    data.items.push(item)
+                }
+            })
+            
+            data.nextpage = res?.data?.nextpage || null;
+
+        } catch (error) {
+            console.log("Failed while fetching search data", error);
+            return { success: false, message: "Failed while fetching search data" };
+        }
+        
+        return { success: true, data: data };
     },
 
     dummy: async () => {
@@ -50,17 +95,28 @@ export const feed = {
             "UCtZO3K2p8mqFwiKWb9k7fXA",
             "UCH4BNI0-FOK2dMXoFtViWHw",
             "UCsooa4yRKGN_zEE8iknghZA",
-            "UCsXVk37bltHxD1rDPwtNM8Q"
+            "UCsXVk37bltHxD1rDPwtNM8Q",
+            "UCR9sFzaG9Ia_kXJhfxtFMBA",
+            "UC7JnIYJEPmoxXJdYb1BhrnQ",
+            "UCweDKPSF65wRw5VHFUJYiow",
+            "UCRlICXvO4XR4HMeEB9JjDlA"
         ]
 
         try {
             let res = await axios.get(`${config.baseUrl}/feed/unauthenticated?channels=${channelList.join(",")}`);
-            data = [...res.data];
+            // add uuid
+            res.data.forEach(item => {
+                item.id = uuid();
+            });
+
+            // Shuffle the array
+            data = [...shuffleArray(res.data)];
         } catch (error) {
             console.log("Failed while fetching dummy feed data", error);
+            return { success: false, message: "Failed while fetching dummy feed data" };
         }
 
-        return data;
+        return { success: true, data: data };
     },
 
     subscriptionBased: async (channelList) => {
@@ -71,20 +127,21 @@ export const feed = {
             data = [...res.data];
         } catch (error) {
             console.log("Failed while fetching user feed data", error);
+            return { success: false, message: "Failed while fetching user feed data" };
         }
 
-        return data;
+        return { success: true, data: data };
     },
 
     suggestionBased: async (channelList) => {
         try {
             if (channelList.length === 0) return { success: false, message: "No channels found" };
-            if (channelList.length > 20) { 
+            if (channelList.length > 20) {
                 // Shuffle before slicing
                 channelList = shuffleArray(channelList);
                 // Limiting the number of channels to 20
-                channelList = channelList.slice(0, 20) 
-            };   
+                channelList = channelList.slice(0, 20)
+            };
 
             let feedStreams = [];
             let suggestionStreamList = [];
@@ -101,12 +158,12 @@ export const feed = {
                 let relataedStreams = streamRes.data.relatedStreams;
                 let streamOnlyList = relataedStreams.filter(item => item.type === "stream");
                 let uploaderIds = streamOnlyList.map(item => {
-                        let uploaderId = item.uploaderUrl.split("/channel/").pop();
-                        return uploaderId;
-                    });
+                    let uploaderId = item.uploaderUrl.split("/channel/").pop();
+                    return uploaderId;
+                });
                 suggestionStreamList.push(...uploaderIds.slice(0, 5));
             });
-            
+
             // Use Promise.all to wait for all promises to resolve
             await Promise.all(channelPromises);
 
