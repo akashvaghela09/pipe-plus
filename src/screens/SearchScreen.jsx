@@ -6,32 +6,37 @@ import { v4 as uuid } from 'uuid';
 import { config } from "../configs/config";
 import { useDispatch } from "react-redux";
 import { setTabBarVisible } from "../redux/app/appSlice";
+import { VideoCard } from "../components/cards/VideoCard";
+import { ChannelCard } from "../components/cards/ChannelCard";
 
 export const SearchScreen = ({ navigation }) => {
     const dispatch = useDispatch();
-    const [searchText, setSearchText] = useState("");
+    const [nextPage, setNextPage] = useState(null);
+    const [query, setQuery] = useState("");
+    const [suggestionList, setSuggestionList] = useState([]);
     const [searchResults, setSearchResults] = useState([]);
-    const [searchAutoFocus, setSearchAutoFocus] = useState(true);
+    const [autoFocus, setAutoFocus] = useState(true);
+    const [showSearchSuggestions, setShowSearchSuggestions] = useState(true);
     const debounceTimeoutRef = useRef(null);
 
     const handleSearchQuery = async () => {
-        if (searchText.length === 0) {
+        if (query.length === 0) {
             return;
         }
 
-        let res = await axios.get(`${config.baseUrl}/suggestions?query=${searchText}`);
+        let res = await axios.get(`${config.baseUrl}/suggestions?query=${query}`);
         data = [...res?.data];
 
-        setSearchResults(data);
+        setSuggestionList(data);
     }
 
     const handleSearchClear = () => {
-        setSearchText("");
-        setSearchAutoFocus(true);
+        setQuery("");
+        setAutoFocus(true);
     }
 
     const handleFillSearchBar = (text) => {
-        setSearchText(text);
+        setQuery(text);
     }
 
     const handleGoBack = () => {
@@ -42,16 +47,35 @@ export const SearchScreen = ({ navigation }) => {
         dispatch(setTabBarVisible(value));
     }
 
-    const handleSearchStream = () => {
+    const handleSearchStream = async () => {
         handleTabBar(true);
 
-        navigation.navigate('result', {
-            query: searchText,
-        });
+        if(query.length === 0) {
+            return;
+        }
+
+        setShowSearchSuggestions(false);
+
+        let res = await axios.get(`${config.baseUrl}/search?q=${query}&filter=all`);
+
+        if(res?.data?.items.length > 0) {
+            setNextPage(res?.data?.nextpage);
+            // setSearchResults(res?.data?.items);
+        }
+
+        let list = [];
+
+        res?.data?.items.forEach((item) => {
+            if(item.type === "channel" || item.type === "stream"){
+                list.push(item)
+            }
+        })
+
+        setSearchResults([...list]);
     }
 
     useEffect(() => {
-        if (searchText.length > 3) {
+        if (query.length > 3) {
             // Clear any existing timeout
             if (debounceTimeoutRef.current) {
                 clearTimeout(debounceTimeoutRef.current);
@@ -62,9 +86,9 @@ export const SearchScreen = ({ navigation }) => {
                 handleSearchQuery();
             }, 500); // 500ms debounce time
         } else {
-            setSearchResults([]);
+            setSuggestionList([]);
         }
-    }, [searchText]);
+    }, [query]);
 
     useEffect(() => {
         handleTabBar(false);
@@ -85,15 +109,15 @@ export const SearchScreen = ({ navigation }) => {
                 <TextInput
                     style={styles.input}
                     onSubmitEditing={handleSearchStream}
-                    onChangeText={setSearchText}
+                    onChangeText={setQuery}
                     onFocus={() => handleTabBar(false)}
-                    value={searchText}
-                    autoFocus={searchAutoFocus}
+                    value={query}
+                    autoFocus={autoFocus}
                     returnKeyType="search"
                     placeholder="Search Youtube"
                 />
                 {
-                    searchText.length > 0 &&
+                    query.length > 0 &&
                     <IconButton
                         icon="close"
                         color="#fff"
@@ -111,6 +135,7 @@ export const SearchScreen = ({ navigation }) => {
                 />
             </View>
             {
+                showSearchSuggestions === true &&
                 searchResults.length > 0 &&
                 searchResults.map((result) => {
                     return (
@@ -139,6 +164,22 @@ export const SearchScreen = ({ navigation }) => {
                             />
                         </View>
                     )
+                })
+            }
+
+            {
+                showSearchSuggestions === false && 
+                searchResults.length > 0 &&
+                searchResults.map((result) => {
+                    if(result.type === "channel") {
+                        return (
+                            <ChannelCard key={uuid()} channel={result} />
+                        )
+                    } else if (result.type === "stream") {
+                        return (
+                            <VideoCard key={uuid()} video={result} />
+                        )
+                    }
                 })
             }
         </ScrollView>
