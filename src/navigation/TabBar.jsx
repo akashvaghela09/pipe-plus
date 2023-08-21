@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { View, Text } from 'react-native';
 import { TouchableRipple } from 'react-native-paper';
 import { screenOptions } from './AppNavigator'; // Assuming both files are in the same directory
-import { Player } from '../components/ui/player/Player';
-import { PlayerSettings } from '../components/ui/bottomSheet/PlayerSettings';
+import { Player } from '../components/player/Player';
+import { PlayerSettings } from '../components/bottomSheet/PlayerSettings';
 import { useSelector } from 'react-redux';
 
 export const TabBar = ({ state, descriptors, navigation }) => {

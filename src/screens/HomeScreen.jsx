@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import axios from "axios";
 import { config } from "../configs/config";
-import { VideoCard } from "../components/ui/VideoCard";
+import { VideoCard } from "../components/cards/VideoCard";
 import { v4 as uuid } from 'uuid';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
-import { Logo } from "../components/ui/Logo";
+import { Logo } from "../components/metadata/Logo";
 import { useNavigation } from '@react-navigation/native';
 
 export const HomeScreen = () => {

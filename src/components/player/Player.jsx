@@ -2,13 +2,13 @@ import { useEffect, useState, useRef } from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, Button as RNButton } from 'react-native';
 import { ActivityIndicator, Button, IconButton, TouchableRipple } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
-import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setSettingsOpen } from '../../../redux/player/playerSlice';
+import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setSettingsOpen } from '../../redux/player/playerSlice';
 import Video from 'react-native-video';
 import { BackHandler } from 'react-native';
 import Slider from '@react-native-community/slider';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { formatNumbers, formatReadableDate, formatTime } from '../../../utils';
-import { VideoCard } from '../VideoCard';
+import { formatNumbers, formatReadableDate, formatTime } from '../../utils';
+import { VideoCard } from '../cards/VideoCard';
 
 export const Player = ({ navigator }) => {
     const dispatch = useDispatch();
