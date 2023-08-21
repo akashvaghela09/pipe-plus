@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
-import axios from "axios";
-import { config } from "../configs/config";
 import { VideoCard } from "../components/cards/VideoCard";
-import { v4 as uuid } from 'uuid';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import { Logo } from "../components/metadata/Logo";
 import { useNavigation } from '@react-navigation/native';
+import { pipePlus } from "../apis";
 
 export const HomeScreen = () => {
     const navigation = useNavigation();
@@ -14,31 +12,14 @@ export const HomeScreen = () => {
 
     const fetchDummyFeed = async () => {
         console.log("Fetching dummy feed data");
-        let data = null;
 
-        let channelList = [
-            "UC4QZ_LsYcvcq7qOsOhpAX4A",
-            "UCtZO3K2p8mqFwiKWb9k7fXA",
-            "UCH4BNI0-FOK2dMXoFtViWHw",
-            "UCsooa4yRKGN_zEE8iknghZA",
-            "UCsXVk37bltHxD1rDPwtNM8Q"
-        ]
+        let res = await pipePlus.feed.dummy();
 
-        try {
-            let res = await axios.get(`${config.baseUrl}/feed/unauthenticated?channels=${channelList.join(",")}`);
-            data = [...res.data];
-
-            data = data.map((feed) => {
-                return {
-                    id: uuid(),
-                    ...feed
-                }
-            });
-
-            setFeedData([...data]);
-        } catch (error) {
-            console.log("Failed while fetching dummy feed data", error);
+        if(res.success === false) {
+            return;
         }
+
+        setFeedData(res.data);
     };
 
     useEffect(() => {
