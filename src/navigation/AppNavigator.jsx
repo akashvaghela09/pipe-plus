@@ -4,8 +4,10 @@ import EntypoIcons from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { enableScreens } from 'react-native-screens';
-import { HomeScreen, SubscriptionScreen, GroupScreen, LibraryScreen } from '../screens';
+import { SubscriptionScreen, GroupScreen, LibraryScreen } from '../screens';
 import { TabBar } from './TabBar';
+import { HomeStackNavigator } from './Stacks/HomeStack';
+
 // Optimize screen performance
 enableScreens();
 
@@ -31,12 +33,12 @@ function AppNavigator() {
             >
                 <Tab.Screen
                     name="Home"
-                    component={HomeScreen}
+                    component={HomeStackNavigator}
                     options={{
+                        tabBarLabel: 'Home',
                         title: 'Home',
                         headerShown: false,
-                    }}
-                />
+                    }} />
                 <Tab.Screen
                     name="Subscription"
                     component={SubscriptionScreen}
@@ -51,7 +53,7 @@ function AppNavigator() {
                     options={{
                         tabBarLabel: 'Group',
                         title: 'Group',
-                        headerShown: false
+                        headerShown: false,
                     }} />
                 <Tab.Screen
                     name="Library"
