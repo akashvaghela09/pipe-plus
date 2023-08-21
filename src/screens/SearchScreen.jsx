@@ -8,19 +8,20 @@ import { useDispatch } from "react-redux";
 import { setTabBarVisible } from "../redux/app/appSlice";
 import { VideoCard } from "../components/cards/VideoCard";
 import { ChannelCard } from "../components/cards/ChannelCard";
+import { pipePlus } from "../apis";
 
 export const SearchScreen = ({ navigation }) => {
     const dispatch = useDispatch();
-    const [nextPage, setNextPage] = useState(null);
     const [query, setQuery] = useState("");
     const [suggestionList, setSuggestionList] = useState([]);
     const [searchResults, setSearchResults] = useState([]);
     const [autoFocus, setAutoFocus] = useState(true);
     const [showSearchSuggestions, setShowSearchSuggestions] = useState(true);
     const debounceTimeoutRef = useRef(null);
+    const searchInitiatedRef = useRef(false);
 
     const handleSearchQuery = async () => {
-        if (query.length === 0) {
+        if (query.length === 0 || searchInitiatedRef.current) {
             return;
         }
 
@@ -28,11 +29,20 @@ export const SearchScreen = ({ navigation }) => {
         data = [...res?.data];
 
         setSuggestionList(data);
+        setSearchResults([]);
+        setShowSearchSuggestions(true);
+
+        searchInitiatedRef.current = false; // Reset the flag at the end
     }
 
     const handleSearchClear = () => {
+        setAutoFocus(false);
         setQuery("");
+        setShowSearchSuggestions(true);
+        setSearchResults([]);
         setAutoFocus(true);
+
+        searchInitiatedRef.current = false; // Reset the flag at the end
     }
 
     const handleFillSearchBar = (text) => {
@@ -47,31 +57,30 @@ export const SearchScreen = ({ navigation }) => {
         dispatch(setTabBarVisible(value));
     }
 
+    const handleSuggestionClick = async (result) => {
+        handleFillSearchBar(result)
+        handleSearchStream();
+    }
+
     const handleSearchStream = async () => {
+        setShowSearchSuggestions(false);
         handleTabBar(true);
 
-        if(query.length === 0) {
+        if (query.length === 0) {
             return;
         }
 
-        setShowSearchSuggestions(false);
+        // If a search is already initiated, dont show suggestions
+        searchInitiatedRef.current = true; // Set the flag
+        clearTimeout(debounceTimeoutRef.current); // Clear the timeout
 
-        let res = await axios.get(`${config.baseUrl}/search?q=${query}&filter=all`);
+        let res = await pipePlus.feed.search(query);
 
-        if(res?.data?.items.length > 0) {
-            setNextPage(res?.data?.nextpage);
-            // setSearchResults(res?.data?.items);
+        if (res.success === false) {
+            return;
         }
 
-        let list = [];
-
-        res?.data?.items.forEach((item) => {
-            if(item.type === "channel" || item.type === "stream"){
-                list.push(item)
-            }
-        })
-
-        setSearchResults([...list]);
+        setSearchResults([...res?.data?.items]);
     }
 
     useEffect(() => {
@@ -84,7 +93,7 @@ export const SearchScreen = ({ navigation }) => {
             // Set a new timeout
             debounceTimeoutRef.current = setTimeout(() => {
                 handleSearchQuery();
-            }, 500); // 500ms debounce time
+            }, 250); // 250ms debounce time
         } else {
             setSuggestionList([]);
         }
@@ -136,17 +145,17 @@ export const SearchScreen = ({ navigation }) => {
             </View>
             {
                 showSearchSuggestions === true &&
-                searchResults.length > 0 &&
-                searchResults.map((result) => {
+                suggestionList.length > 0 &&
+                suggestionList.map((result) => {
                     return (
-                        <View key={uuid()} style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                            <TouchableOpacity activeOpacity={0.8} style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+                        <View key={uuid()} style={styles.centerItem}>
+                            <TouchableOpacity onPress={() => handleSuggestionClick(result)} activeOpacity={0.8} style={styles.centerItem}>
                                 <IconButton
                                     icon="history"
                                     color="#fff"
                                     size={25}
                                     onPress={() => console.log('Pressed')}
-                                    style={{ padding: 0, marginTop: 0, marginBottom: 0 }}
+                                    style={styles.icon}
                                 />
                                 <Text
                                     numberOfLines={1}
@@ -160,7 +169,7 @@ export const SearchScreen = ({ navigation }) => {
                                 color="#fff"
                                 size={25}
                                 onPress={() => handleFillSearchBar(result)}
-                                style={{ padding: 0, marginTop: 0, marginBottom: 0 }}
+                                style={styles.icon}
                             />
                         </View>
                     )
@@ -168,10 +177,10 @@ export const SearchScreen = ({ navigation }) => {
             }
 
             {
-                showSearchSuggestions === false && 
+                showSearchSuggestions === false &&
                 searchResults.length > 0 &&
                 searchResults.map((result) => {
-                    if(result.type === "channel") {
+                    if (result.type === "channel") {
                         return (
                             <ChannelCard key={uuid()} channel={result} />
                         )
@@ -200,4 +209,14 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 9999,
     },
+    icon: {
+        padding: 0,
+        marginTop: 0,
+        marginBottom: 0
+    },
+    centerItem: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center"
+    }
 });
