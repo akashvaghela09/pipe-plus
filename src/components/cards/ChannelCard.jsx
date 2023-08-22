@@ -1,5 +1,5 @@
 import { Image, View, StyleSheet } from "react-native";
-import { Text } from "react-native-paper";
+import { Text, Button } from "react-native-paper";
 import { formatNumbers } from "../../utils";
 
 export const ChannelCard = ({ channel }) => {
@@ -15,8 +15,18 @@ export const ChannelCard = ({ channel }) => {
             </View>
             <View style={styles.metadata}>
                 <Text style={styles.title}>{name}</Text>
-                <Text style={styles.text} numberOfLines={2}>{description}</Text>
                 <Text style={styles.text}>{formatNumbers(subscribers)} subscribers</Text>
+                <Button
+                    onPress={() => console.log('Pressed')}
+                    mode="contained"
+                    labelStyle={{ color: "#212121" , fontSize: 12,  height: 20 }}
+                    contentStyle={{ height: 33}}
+                    style={{ width: 80, marginTop: 15 }}
+                    buttonColor="white"
+                    compact={true}
+                >
+                    Subscribe
+                </Button>
             </View>
         </View>
     )
@@ -26,26 +36,28 @@ const styles = StyleSheet.create({
     wrapper: {
         flexDirection: "row",
         justifyContent: "space-between",
-    },
-    thumbnailContainer: {
-        margin: 20,
-        marginLeft: 40,
-        marginRight: 40,
         borderWidth: 1,
         borderColor: "#212121",
-        borderRadius: 99999,
+    },
+    thumbnailContainer: {
+        flex: 1,
+        margin: 20,
+        justifyContent: "center",
+        alignItems: "center",
     },
     thumbnail: {
         width: 80,
         height: 80,
         borderRadius: 50,
+        borderWidth: 1,
+        borderColor: "#212121",
+        borderRadius: 99999,
     },
     metadata: {
         flex: 1,
         flexDirection: "column",
         justifyContent: "center",        
-        gap: 3,
-        marginRight: 20,
+        marginRight: 40,
     },
     title: {
         color: "#fff",
