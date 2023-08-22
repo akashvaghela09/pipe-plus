@@ -1,26 +1,25 @@
-import { ScrollView, Text, View } from "react-native";
-import { Button } from "react-native-paper";
-import  { useDispatch, useSelector } from "react-redux";
-import { setCount } from "../redux/app/appSlice";
+import { useEffect, useState } from "react";
+import { ScrollView, Text, View, StyleSheet } from "react-native";
+import { pipePlus } from "../apis";
+import { IconButton } from "react-native-paper";
+
 export const GroupScreen = () => {
 
-    const dispatch = useDispatch();
-
-    const { count } = useSelector(state => state.app);
-
-    const Increment = () => {
-        dispatch(setCount(count + 1));
-    };
 
     return (
-        <ScrollView className="h-screen">
+        <View className="bg-[#0f0f0f]">
             <View className="flex justify-center items-center h-screen">
-                <Text className="text-3xl font-bold">Group Screen</Text>
-                <Text className="text-4xl my-10">{count}</Text>
-                <Button mode="contained" onPress={() => Increment()} className="bg-sky-600 text-slate-100" labelStyle={{fontSize: 20}}>
-                    Increment
-                </Button>
+                <IconButton
+                    icon="alert-circle-outline"
+                    color="#212121"
+                    size={80}
+                />
+                <Text className="text-2xl font-bold text-slate-100 text-opacity-50">No groups found 😢</Text>
             </View>
-        </ScrollView>
+        </View>
     )
 };
+
+const styles = StyleSheet.create({
+
+});
