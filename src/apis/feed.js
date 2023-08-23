@@ -125,6 +125,11 @@ export const feed = {
         try {
             let res = await axios.get(`${config.baseUrl}/feed/unauthenticated?channels=${channelList.join(",")}`);
             data = [...res.data];
+
+            res.data.forEach(item => {
+                item.id = uuid();
+            });
+            
         } catch (error) {
             console.log("Failed while fetching user feed data", error);
             return { success: false, message: "Failed while fetching user feed data" };
@@ -177,6 +182,10 @@ export const feed = {
             let suggestionBasedFeed = shuffleArray(relatedRes.data);
 
             let finalFeed = shuffleArray([...feedStreams, ...suggestionBasedFeed.slice(0, allowedSuggestions)]);
+
+            finalFeed.forEach(item => {
+                item.id = uuid();
+            });
 
             return { success: true, data: finalFeed };
         } catch (error) {
