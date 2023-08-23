@@ -6,8 +6,10 @@ import { v4 as uuid } from 'uuid';
 import { config } from "../configs/config";
 import { useDispatch } from "react-redux";
 import { setTabBarVisible } from "../redux/app/appSlice";
-import { VideoCard , ChannelCard } from "../components/";
+import { VideoCard, ChannelCard } from "../components/";
 import { pipePlus } from "../apis";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useTheme } from "react-native-paper";
 
 export const SearchScreen = ({ navigation }) => {
     const dispatch = useDispatch();
@@ -18,7 +20,8 @@ export const SearchScreen = ({ navigation }) => {
     const [showSearchSuggestions, setShowSearchSuggestions] = useState(true);
     const debounceTimeoutRef = useRef(null);
     const searchInitiatedRef = useRef(false);
-
+    const { colors } = useTheme();
+    
     const handleSearchQuery = async () => {
         if (query.length === 0 || searchInitiatedRef.current) {
             return;
@@ -106,16 +109,15 @@ export const SearchScreen = ({ navigation }) => {
     }, []);
 
     return (
-        <ScrollView style={styles.wrapper} keyboardShouldPersistTaps="always">
+        <ScrollView style={{...styles.wrapper, backgroundColor: colors.background}} keyboardShouldPersistTaps="always">
             <View className="flex flex-row items-center">
                 <IconButton
-                    icon="arrow-left"
-                    color="#fff"
+                    icon={() => <Icon name="arrow-left" size={25} color={colors.neutral300} />}
                     size={25}
                     onPress={() => handleGoBack()}
                 />
                 <TextInput
-                    style={styles.input}
+                    style={{...styles.input, backgroundColor: colors.neutral800}}
                     onSubmitEditing={handleSearchStream}
                     onChangeText={setQuery}
                     onFocus={() => handleTabBar(false)}
@@ -127,19 +129,18 @@ export const SearchScreen = ({ navigation }) => {
                 {
                     query.length > 0 &&
                     <IconButton
-                        icon="close"
-                        color="#fff"
+                        icon={() => <Icon name="close" size={25} color={colors.neutral300} />}
                         size={22}
                         onPress={() => handleSearchClear()}
                         style={{ position: "absolute", right: 45, top: 2 }}
                     />
                 }
                 <IconButton
-                    icon="magnify"
-                    color="#fff"
+                    icon={() => <Icon name="magnify" size={25} color={colors.neutral300} />}
                     size={22}
                     onPress={handleSearchStream}
                     mode="contained"
+                    style={{ backgroundColor: colors.neutral800 }}
                 />
             </View>
             {
@@ -150,22 +151,19 @@ export const SearchScreen = ({ navigation }) => {
                         <View key={uuid()} style={styles.centerItem}>
                             <TouchableOpacity onPress={() => handleSuggestionClick(result)} activeOpacity={0.8} style={styles.centerItem}>
                                 <IconButton
-                                    icon="history"
-                                    color="#fff"
-                                    size={25}
+                                    icon={() => <Icon name="history" size={25} color={colors.neutral300} />}
                                     onPress={() => console.log('Pressed')}
                                     style={styles.icon}
                                 />
                                 <Text
                                     numberOfLines={1}
-                                    style={{ flex: 1 }}
+                                    style={{ flex: 1, fontWeight: 600, color: colors.neutral300 }}
                                 >
                                     {result}
                                 </Text>
                             </TouchableOpacity>
                             <IconButton
-                                icon="arrow-top-left"
-                                color="#fff"
+                                icon={() => <Icon name="arrow-top-left" size={25} color={colors.neutral300} />}
                                 size={25}
                                 onPress={() => handleFillSearchBar(result)}
                                 style={styles.icon}
@@ -196,11 +194,9 @@ export const SearchScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     wrapper: {
-        backgroundColor: "#0f0f0f",
         width: "100%",
     },
     input: {
-        backgroundColor: "#272727",
         margin: 3,
         padding: 15,
         paddingBottom: 5,
