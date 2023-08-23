@@ -3,31 +3,50 @@ import { ScrollView, Text, View, StyleSheet } from "react-native";
 import { pipePlus } from "../apis";
 import { IconButton, useTheme } from "react-native-paper";
 import { Button } from "../theme";
-import { Header } from "../components";
+import { Header, VideoCard } from "../components";
 
 export const SubscriptionScreen = () => {
     const { colors } = useTheme();
-    const [subscriptions, setSubscriptions] = useState([]);
+    const [subscriptionFeed, setSubscriptionFeed] = useState([]);
 
-    const fetchUserSubscriptions = async () => {
-        let data = await pipePlus.user.subscriptions();
-        console.log(data);
+    const fetchFeed = async () => {
+        console.log("Fetching subscription feed ...");
+
+        let list = await pipePlus.user.subscriptions();
+        let totalSubscriptions = list.data.length;
+
+        if(totalSubscriptions === 0) {
+            let res = await pipePlus.feed.dummy();
+    
+            if (res.success === false) {
+                return;
+            }
+    
+            setSubscriptionFeed(res.data);
+            return;
+        }
+
+        let res = await pipePlus.feed.subscriptionBased(list.data);
+        
+        if (res.success === false) {
+            return;
+        }
+
+        let feed = [...res.data];
+
+        setSubscriptionFeed(feed);
     }
 
     useEffect(() => {
-        fetchUserSubscriptions();
+        fetchFeed();
     }, []);
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#0f0f0f' }}>
             {/* Header section with logo and icons */}
             <Header />
-
-            <View className="bg-[#0f0f0f]" style={{ flex: 1, backgroundColor: colors.background }}>
-                <Button title="Fetch Subscriptions" onPress={fetchUserSubscriptions} />
-
-                {/* {
-                subscriptions.length === 0 &&
+                {
+                subscriptionFeed.length === 0 &&
                 <View className="flex justify-center items-center h-screen">
                     <IconButton
                         icon="alert-circle-outline"
@@ -39,12 +58,13 @@ export const SubscriptionScreen = () => {
             }
 
             {
-                subscriptions.length > 0 &&
-                <View className="flex justify-center items-center h-screen">
-                    <Text className="text-3xl font-bold">Subscription Screen</Text>
-                </View>
-            } */}
-            </View>
+                subscriptionFeed.length > 0 &&
+                subscriptionFeed.map((video, index) => {
+                    return (
+                            <VideoCard key={video.id} video={video} />
+                    )
+                })
+            }
         </ScrollView>
     )
 };

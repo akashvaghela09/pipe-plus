@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Header, VideoCard } from "../components/";
-import EvilIcons from 'react-native-vector-icons/EvilIcons';
-import { Logo } from "../components/";
 import { useNavigation } from '@react-navigation/native';
 import { pipePlus } from "../apis";
+import { shuffleArray } from "../utils";
 
 export const HomeScreen = () => {
     const navigation = useNavigation();
@@ -22,8 +21,35 @@ export const HomeScreen = () => {
         setFeedData(res.data);
     };
 
+    const fetchFeed = async () => {
+        console.log("Fetching feed data");
+
+        let list = await pipePlus.user.subscriptions();
+        let totalSubscriptions = list.data.length;
+
+        if(totalSubscriptions === 0) {
+            let res = await pipePlus.feed.dummy();
+    
+            if (res.success === false) {
+                return;
+            }
+    
+            setFeedData(res.data);
+            return;
+        }
+
+        let res = await pipePlus.feed.suggestionBased(list.data);
+        
+        if (res.success === false) {
+            return;
+        }
+
+        let feed = [...shuffleArray(res.data)];
+        setFeedData(feed);
+    }
+
     useEffect(() => {
-        fetchDummyFeed();
+        fetchFeed();
     }, []);
 
     return (
