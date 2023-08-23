@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect, useRef } from "react";
-import { ScrollView, View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
+import { ScrollView, View, Text, TextInput, StyleSheet, TouchableOpacity, Keyboard } from "react-native";
 import { IconButton } from "react-native-paper";
 import { v4 as uuid } from 'uuid';
 import { config } from "../configs/config";
@@ -21,7 +21,7 @@ export const SearchScreen = ({ navigation }) => {
     const debounceTimeoutRef = useRef(null);
     const searchInitiatedRef = useRef(false);
     const { colors } = useTheme();
-    
+
     const handleSearchQuery = async () => {
         if (query.length === 0 || searchInitiatedRef.current) {
             return;
@@ -44,6 +44,8 @@ export const SearchScreen = ({ navigation }) => {
         setSearchResults([]);
         setAutoFocus(true);
 
+        renderTabBar(false);
+
         searchInitiatedRef.current = false; // Reset the flag at the end
     }
 
@@ -55,7 +57,7 @@ export const SearchScreen = ({ navigation }) => {
         navigation.goBack();
     }
 
-    const handleTabBar = (value) => {
+    const renderTabBar = (value) => {
         dispatch(setTabBarVisible(value));
     }
 
@@ -66,7 +68,9 @@ export const SearchScreen = ({ navigation }) => {
 
     const handleSearchStream = async () => {
         setShowSearchSuggestions(false);
-        handleTabBar(true);
+        renderTabBar(true);
+        Keyboard.dismiss();
+
 
         if (query.length === 0) {
             return;
@@ -102,9 +106,9 @@ export const SearchScreen = ({ navigation }) => {
     }, [query]);
 
     useEffect(() => {
-        handleTabBar(false);
+        renderTabBar(false);
         return () => {
-            handleTabBar(true);
+            renderTabBar(true);
         }
     }, []);
 
@@ -120,7 +124,7 @@ export const SearchScreen = ({ navigation }) => {
                     style={{...styles.input, backgroundColor: colors.neutral800}}
                     onSubmitEditing={handleSearchStream}
                     onChangeText={setQuery}
-                    onFocus={() => handleTabBar(false)}
+                    onFocus={() => renderTabBar(false)}
                     value={query}
                     autoFocus={autoFocus}
                     returnKeyType="search"
@@ -149,7 +153,7 @@ export const SearchScreen = ({ navigation }) => {
                 suggestionList.map((result) => {
                     return (
                         <View key={uuid()} style={styles.centerItem}>
-                            <TouchableOpacity onPress={() => handleSuggestionClick(result)} activeOpacity={0.8} style={styles.centerItem}>
+                            <TouchableOpacity onPress={() => handleSuggestionClick(result)} activeOpacity={0.7} style={styles.centerItem}>
                                 <IconButton
                                     icon={() => <Icon name="history" size={25} color={colors.neutral300} />}
                                     onPress={() => console.log('Pressed')}
