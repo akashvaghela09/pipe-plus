@@ -1,9 +1,45 @@
+import { useState, useEffect } from "react";
 import { Image, View, StyleSheet } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { formatNumbers } from "../../utils";
+import { Button } from "../../theme";
+import { pipePlus } from "../../apis";
+import { useTheme } from "react-native-paper";
 
 export const ChannelCard = ({ channel }) => {
+    const { colors } = useTheme();
     const { name, thumbnail, description, subscribers, verified } = channel;
+    const [subscribed, setSubscribed] = useState(false);
+    const channelId = channel?.url?.split("/channel/")[1];
+
+    const handleSubscribe = async () => {
+        let data = await pipePlus.channel.subscribe(channelId);
+
+        if (data.success === true) {
+            setSubscribed(true);
+        }
+    }
+
+    const handleUnsubscribe = async () => {
+        let data = await pipePlus.channel.unsubscribe(channelId);
+
+        if (data.success === true) {
+            setSubscribed(false);
+        }
+    }
+
+    const checkSubscription = async () => {
+
+        let status = await pipePlus.channel.subscriptionStatus(channelId);
+
+        if (status.subscribed === true) {
+            setSubscribed(true);
+        }
+    }
+
+    useEffect(() => {
+        checkSubscription();
+    }, [subscribed]);
 
     return (
         <View style={styles.wrapper}>
@@ -16,17 +52,14 @@ export const ChannelCard = ({ channel }) => {
             <View style={styles.metadata}>
                 <Text style={styles.title}>{name}</Text>
                 <Text style={styles.text}>{formatNumbers(subscribers)} subscribers</Text>
-                <Button
-                    onPress={() => console.log('Pressed')}
-                    mode="contained"
-                    labelStyle={{ color: "#212121" , fontSize: 12,  height: 20 }}
-                    contentStyle={{ height: 33}}
-                    style={{ width: 80, marginTop: 15 }}
-                    buttonColor="white"
-                    compact={true}
-                >
-                    Subscribe
-                </Button>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15 }}>
+                    <Button
+                        title={subscribed ? "Unsubscribe" : "Subscribe"}
+                        onPress={() => subscribed ? handleUnsubscribe() : handleSubscribe()}
+                        labelStyle={{ color: subscribed ? "white" : "black" }}
+                        style={{ backgroundColor: subscribed ? colors.dark02 : "white" }}
+                    />
+                </View>
             </View>
         </View>
     )
@@ -56,7 +89,7 @@ const styles = StyleSheet.create({
     metadata: {
         flex: 1,
         flexDirection: "column",
-        justifyContent: "center",        
+        justifyContent: "center",
         marginRight: 40,
     },
     title: {
