@@ -1,18 +1,20 @@
 import { useEffect, useState, useRef } from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { ActivityIndicator, Button, IconButton, TouchableRipple } from 'react-native-paper';
+import { ActivityIndicator, IconButton, TouchableRipple } from 'react-native-paper';
+import { Button } from "../../theme/";
 import { useSelector, useDispatch } from 'react-redux';
 import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setSettingsOpen } from '../../redux/player/playerSlice';
 import Video from 'react-native-video';
 import { BackHandler } from 'react-native';
 import Slider from '@react-native-community/slider';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { formatNumbers, formatReadableDate, formatTime } from '../../utils';
+import { formatNumbers, formatReadableDate, formatTime, isValid } from '../../utils';
 import { VideoCard } from '../';
-
+import { useTheme } from 'react-native-paper';
+import { pipePlus } from '../../apis';
 export const Player = ({ navigator }) => {
     const dispatch = useDispatch();
-
+    const { colors } = useTheme();
     const {
         isFullScreen,
         isVisible,
@@ -31,7 +33,8 @@ export const Player = ({ navigator }) => {
         uploaded,
         uploadedDate,
         uploaderName,
-        uploaderSubscriberCount
+        uploaderSubscriberCount,
+        uploaderUrl
     } = streamMetadata;
 
     const [played, setPlayed] = useState(0);
@@ -45,6 +48,7 @@ export const Player = ({ navigator }) => {
     const [seekSide, setSeekSide] = useState(null);
     const [sliderTimer, setSliderTimer] = useState(null);
     const [subscribed, setSubscribed] = useState(false);
+    const [channelId, setChannelId] = useState(null);
 
     const handlePlayback = (status) => {
         dispatch(setIsPlaying(status));
@@ -135,14 +139,30 @@ export const Player = ({ navigator }) => {
         dispatch(setSettingsOpen(true));
     }
 
-    const handleSubscribe = () => {
-        // alert("Subscribe");
-        setSubscribed(true);
+    const handleSubscribe = async () => {
+        let data = await pipePlus.channel.subscribe(channelId);
+        if (data.success === true) {
+            setSubscribed(true);
+        }
     }
 
-    const handleUnsubscribe = () => {
-        // alert("Unsubscribe");
-        setSubscribed(false);
+    const handleUnsubscribe = async () => {
+        let data = await pipePlus.channel.unsubscribe(channelId);
+        if (data.success === true) {
+            setSubscribed(false);
+        }
+    }
+
+    const checkSubscription = async () => {
+        const id = uploaderUrl?.split("/channel/")[1];
+        setChannelId(id);
+
+        let status = await pipePlus.channel.subscriptionStatus(id);
+        if (status.subscribed === true) {
+            setSubscribed(true);
+        } else {
+            setSubscribed(false);
+        }
     }
 
     useEffect(() => {
@@ -179,6 +199,10 @@ export const Player = ({ navigator }) => {
             }
         };
     }, [isSliderVisible]);
+
+    useEffect(() => {
+            checkSubscription();
+    }, [subscribed, streamMetadata.uploaderUrl]);
 
     return (
         isVisible &&
@@ -322,16 +346,11 @@ export const Player = ({ navigator }) => {
                                 </View>
 
                                 <Button
+                                    title={subscribed ? "Unsubscribe" : "Subscribe"}
                                     onPress={() => subscribed ? handleUnsubscribe() : handleSubscribe()}
-                                    mode="contained"
-                                    labelStyle={{ color: subscribed ? "white" : "black", fontSize: 12, height: 20 }}
-                                    contentStyle={{ height: 33 }}
-                                    style={{ width: subscribed ? 100 : 80 }}
-                                    buttonColor={subscribed ? "#313131" : "white"}
-                                    compact={true}
-                                >
-                                    {subscribed ? "Unsubscribe" : "Subscribe"}
-                                </Button>
+                                    labelStyle={{ color: subscribed ? "white" : "black" }}
+                                    style={{ backgroundColor: subscribed ? colors.primary : "white" }}
+                                />
                             </View>
                         </View>
                     }
