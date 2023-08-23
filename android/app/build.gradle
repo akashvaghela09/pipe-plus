@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.pipeplus"
+    namespace "in.app3.ozon"
     defaultConfig {
-        applicationId "com.pipeplus"
+        applicationId "in.app3.ozon"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
