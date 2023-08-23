@@ -6,7 +6,7 @@ export { ChannelCard } from "./cards/ChannelCard";
 export { VideoCard } from "./cards/VideoCard";
 
 // Search bar
-export { SearchBar } from "./searchBar/SearchBar";
+export { Header } from "./header/Header";
 
 // Metadata Items
 export { Logo } from "./metadata/Logo";

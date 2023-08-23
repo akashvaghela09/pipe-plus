@@ -1,9 +1,9 @@
 import { View } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
-import { Logo } from "../";
+import { Logo } from "..";
 
-export const SearchBar = () => {
+export const Header = () => {
     const navigation = useNavigation();
 
     return (
