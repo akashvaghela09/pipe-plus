@@ -1,15 +1,16 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { formatNumbers, formatReadableDate, formatTime, isValid } from '../../utils';
 import { useDispatch } from 'react-redux';
-import { 
-    setAvailableQualities, 
-    setHlsUrl, 
-    setIsVisible, 
-    setLoading, 
-    setRelatedStreams, 
-    setSize, 
-    setStreamMetadata, 
-    setStreamUrl } from '../../redux/player/playerSlice';
+import {
+    setAvailableQualities,
+    setHlsUrl,
+    setIsVisible,
+    setLoading,
+    setRelatedStreams,
+    setSize,
+    setStreamMetadata,
+    setStreamUrl
+} from '../../redux/player/playerSlice';
 import axios from 'axios';
 import { config } from '../../configs/config';
 
@@ -99,8 +100,8 @@ export const VideoCard = ({ video }) => {
                     <View className="p-2 py-2">
                         <Image source={{ uri: video.uploaderAvatar }} className="w-10 h-10 rounded-full" />
                     </View>
-                    <View className="py-1 mx-1 w-full">
-                        <Text className="text-slate-100 my-1" style={{ fontWeight: "500" }}>{video.title}</Text>
+                    <View className="flex flex-col py-1 mx-1" style={{ flex: 1, alignItems: "flex-start" }}>
+                        <Text numberOfLines={1} className="text-slate-100 my-1" style={{ fontWeight: "500" }}>{video.title}</Text>
                         <Text className="text-slate-100 text-opacity-50 text-[11px]" style={{ opacity: 0.5 }}>{video.uploaderName} • {formatNumbers(video.views)} • {formatReadableDate(video.uploaded)}</Text>
                     </View>
                 </View>
