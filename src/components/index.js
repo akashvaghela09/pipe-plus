@@ -5,6 +5,9 @@ export { PlayerSettings } from "./bottomSheet/PlayerSettings";
 export { ChannelCard } from "./cards/ChannelCard";
 export { VideoCard } from "./cards/VideoCard";
 
+// Search bar
+export { SearchBar } from "./searchBar/SearchBar";
+
 // Metadata Items
 export { Logo } from "./metadata/Logo";
 
