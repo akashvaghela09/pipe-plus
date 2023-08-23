@@ -53,6 +53,55 @@ export const channel = {
         return returnRes;
     },
 
+    unsubscribe: async (channelId) => {
+        let returnRes = {
+            success: false,
+            unsubscribed: false,
+            countUpdated: false
+        }
+
+        if(!isValid(channelId)) {
+            console.log("Invalid channelId", channelId);
+            return { success: false, unsubscribed: false };
+        }
+
+        // check if already subscribed
+        const subscriptions = await EncryptedStorage.getItem("subscriptions");
+        const subscriptionsCount = await EncryptedStorage.getItem("subscriptions_count");
+
+        if (subscriptions === null) {
+            console.log("Failed while getting subscriptions", subscriptions);
+            return { success: false, unsubscribed: false };
+        }
+
+        let subscriptionStatus = subscriptions.includes(channelId);
+
+        if(subscriptionStatus === true){
+            // remove from subscriptions
+            let subscriptionsArr = JSON.parse(subscriptions);
+            let filteredSubscriptions = subscriptionsArr.filter(item => item !== channelId);
+            await EncryptedStorage.setItem('subscriptions', JSON.stringify(filteredSubscriptions));
+
+            // update subscriptions count
+            let subscriptionsCountInt = parseInt(subscriptionsCount);
+            await EncryptedStorage.setItem('subscriptions_count', JSON.stringify(subscriptionsCountInt - 1));
+
+            returnRes.unsubscribed = true;
+            returnRes.countUpdated = true;
+        } else if (subscriptionStatus === false) {
+            returnRes.unsubscribed = false;
+            returnRes.countUpdated = false;
+            returnRes.success = false;
+
+            console.log("Subscription not found ", channelId);
+            return returnRes;
+        }
+
+        returnRes.success = true;
+
+        return returnRes;
+    },
+
     subscriptionStatus: async (channelId) => {
         if(!isValid(channelId)) {
             console.log("Invalid channelId", channelId);
