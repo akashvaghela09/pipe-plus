@@ -4,9 +4,9 @@ import EntypoIcons from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { enableScreens } from 'react-native-screens';
-import { SubscriptionScreen, GroupScreen, LibraryScreen } from '../screens';
-import { TabBar } from './TabBar';
-import { HomeStackNavigator } from './Stacks/HomeStack';
+import { SubscriptionScreen, GroupScreen, LibraryScreen } from '../../screens';
+import { TabBar } from '../';
+import { HomeStackNavigator } from '../';
 
 // Optimize screen performance
 enableScreens();
@@ -25,7 +25,7 @@ export const screenOptions = (route, color) => {
     }
 };
 
-function AppNavigator() {
+export const AppNavigator = () => {
     return (
         <NavigationContainer>
             <Tab.Navigator
@@ -70,5 +70,3 @@ function AppNavigator() {
         </NavigationContainer>
     );
 }
-
-export default AppNavigator;

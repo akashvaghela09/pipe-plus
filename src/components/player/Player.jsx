@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, Button as RNButton } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { ActivityIndicator, Button, IconButton, TouchableRipple } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setSettingsOpen } from '../../redux/player/playerSlice';
@@ -8,7 +8,7 @@ import { BackHandler } from 'react-native';
 import Slider from '@react-native-community/slider';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { formatNumbers, formatReadableDate, formatTime } from '../../utils';
-import { VideoCard } from '../cards/VideoCard';
+import { VideoCard } from '../';
 
 export const Player = ({ navigator }) => {
     const dispatch = useDispatch();
@@ -44,6 +44,7 @@ export const Player = ({ navigator }) => {
     const [isRippleVisible, setRippleVisible] = useState(false);
     const [seekSide, setSeekSide] = useState(null);
     const [sliderTimer, setSliderTimer] = useState(null);
+    const [subscribed, setSubscribed] = useState(false);
 
     const handlePlayback = (status) => {
         dispatch(setIsPlaying(status));
@@ -132,6 +133,16 @@ export const Player = ({ navigator }) => {
 
     const handleSettingsOpen = () => {
         dispatch(setSettingsOpen(true));
+    }
+
+    const handleSubscribe = () => {
+        // alert("Subscribe");
+        setSubscribed(true);
+    }
+
+    const handleUnsubscribe = () => {
+        // alert("Unsubscribe");
+        setSubscribed(false);
     }
 
     useEffect(() => {
@@ -310,8 +321,16 @@ export const Player = ({ navigator }) => {
                                     </View>
                                 </View>
 
-                                <Button mode='elevated' textColor='black' buttonColor='white'>
-                                    Subscribe
+                                <Button
+                                    onPress={() => subscribed ? handleUnsubscribe() : handleSubscribe()}
+                                    mode="contained"
+                                    labelStyle={{ color: subscribed ? "white" : "black", fontSize: 12, height: 20 }}
+                                    contentStyle={{ height: 33 }}
+                                    style={{ width: subscribed ? 100 : 80 }}
+                                    buttonColor={subscribed ? "#313131" : "white"}
+                                    compact={true}
+                                >
+                                    {subscribed ? "Unsubscribe" : "Subscribe"}
                                 </Button>
                             </View>
                         </View>

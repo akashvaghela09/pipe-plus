@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { VideoCard } from "../components/cards/VideoCard";
+import { VideoCard } from "../components/";
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
-import { Logo } from "../components/metadata/Logo";
+import { Logo } from "../components/";
 import { useNavigation } from '@react-navigation/native';
 import { pipePlus } from "../apis";
 
@@ -29,7 +29,7 @@ export const HomeScreen = () => {
     return (
         <View style={{ flex: 1, backgroundColor: '#0f0f0f' }}>
             {/* Header section with logo and icons */}
-            <View className="flex flex-row p-2 items-center justify-between border-b-[1px] border-slate-100">
+            <View className="flex flex-row p-2 items-center justify-between border-b-[1px] border-[#212121]">
                 <Logo />
                 <View className="flex flex-row gap-2 items-center px-2">
                     <EvilIcons name="search" size={32} color="#fff" onPress={() => navigation.navigate('search')} />

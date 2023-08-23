@@ -6,8 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { config } from "../configs/config";
 import { useDispatch } from "react-redux";
 import { setTabBarVisible } from "../redux/app/appSlice";
-import { VideoCard } from "../components/cards/VideoCard";
-import { ChannelCard } from "../components/cards/ChannelCard";
+import { VideoCard , ChannelCard } from "../components/";
 import { pipePlus } from "../apis";
 
 export const SearchScreen = ({ navigation }) => {
@@ -107,7 +106,7 @@ export const SearchScreen = ({ navigation }) => {
     }, []);
 
     return (
-        <ScrollView style={styles.wrapper}>
+        <ScrollView style={styles.wrapper} keyboardShouldPersistTaps="always">
             <View className="flex flex-row items-center">
                 <IconButton
                     icon="arrow-left"

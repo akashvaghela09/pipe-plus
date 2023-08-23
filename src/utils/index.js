@@ -33,5 +33,7 @@ export {
 export { 
     waitFor, 
     isValid,
-    shuffleArray 
+    shuffleArray,
+    cleanNextPageToken,
+    filterUniqueObj
 } from './helper';

@@ -1,7 +1,15 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { formatNumbers, formatReadableDate, formatTime, isValid } from '../../utils';
 import { useDispatch } from 'react-redux';
-import { setAvailableQualities, setHlsUrl, setIsVisible, setLoading, setRelatedStreams, setSize, setStreamMetadata, setStreamUrl } from '../../redux/player/playerSlice';
+import { 
+    setAvailableQualities, 
+    setHlsUrl, 
+    setIsVisible, 
+    setLoading, 
+    setRelatedStreams, 
+    setSize, 
+    setStreamMetadata, 
+    setStreamUrl } from '../../redux/player/playerSlice';
 import axios from 'axios';
 import { config } from '../../configs/config';
 
@@ -85,7 +93,7 @@ export const VideoCard = ({ video }) => {
             <View className="mb-4">
                 <View className="relative">
                     <Image source={{ uri: video.thumbnail }} className="w-full aspect-video" />
-                    <Text className="absolute bottom-0 right-0 px-1 m-2 rounded-md bg-black text-slate-100">{formatTime(video.duration)}</Text>
+                    <Text className="absolute bottom-0 right-0 px-1 m-2 rounded-md bg-[#00000080] text-slate-100">{formatTime(video.duration)}</Text>
                 </View>
                 <View className="flex flex-row items-start py-1">
                     <View className="p-2 py-2">
