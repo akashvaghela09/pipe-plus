@@ -37,3 +37,13 @@ export {
     cleanNextPageToken,
     filterUniqueObj
 } from './helper';
+
+// Array utils
+export { 
+    isUnique
+} from './array';
+
+// Store utils
+export {
+    addInitialValues
+} from './store';
