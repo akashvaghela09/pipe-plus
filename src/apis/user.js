@@ -1,7 +1,5 @@
-import { config } from "../configs/config";
-// import { supabase } from "../configs/supabase-config";
-import { isValid } from "../utils";
-import axios from "axios";
+import EncryptedStorage from 'react-native-encrypted-storage';
+import { isValid } from '../utils';
 
 export const user = {
     // subscriptions: async (user_id) => {
@@ -32,5 +30,20 @@ export const user = {
 
     //     return { success: true, list: result }
     // }
+    subscriptions: async () => {
+        let data = [];
+
+        try {   
+            const subscriptions = await EncryptedStorage.getItem("subscriptions");
+            if (isValid(subscriptions)) {
+                data = JSON.parse(subscriptions);
+            }
+        } catch (error) {
+            console.log("Something went wrong while fetching subscription ", error.code);
+            return { success: false, error: error.code }
+        }
+
+        return { success: true, data: data }
+    }
 };
 
