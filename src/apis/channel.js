@@ -1,144 +1,80 @@
+import EncryptedStorage from 'react-native-encrypted-storage';
 import { config } from "../configs/config";
-// import { supabase } from "../configs/supabase-config";
 import { isValid } from "../utils";
 import axios from "axios";
 
 export const channel = {
-    // subscribe: async (updateData) => {
-    //     let status = {
-    //         subscribed: false,
-    //         countUpdated: false
-    //     }
+    subscribe: async (channelId) => {
+        let returnRes = {
+            success: false,
+            subscribed: false,
+            countUpdated: false
+        }
 
-    //     // check if already subscribed
-    //     const subRes = await supabase
-    //         .from('pipe_subscriptions')
-    //         .select('user_id, uploader_id')
-    //         .eq('uploader_id', updateData.uploader_id)
+        if(!isValid(channelId)) {
+            console.log("Invalid channelId", channelId);
+            return { success: false, subscribed: false };
+        }
 
-    //     if (isValid(subRes.error)) {
-    //         console.log("Failed while checking subscription", subRes.error);
-    //         return { success: false, error: subRes.error, ...status }
-    //     }
+        // check if already subscribed
+        const subscriptions = await EncryptedStorage.getItem("subscriptions");
+        const subscriptionsCount = await EncryptedStorage.getItem("subscriptions_count");
 
-    //     if (subRes.data.length > 0) {
-    //         console.log("Already subscribed");
-    //         return status;
-    //     }
+        if (subscriptions === null) {
+            console.log("Failed while getting subscriptions", subscriptions);
+            return { success: false, subscribed: false };
+        }
 
-    //     // subscribe to channel
-    //     const writeRes = await supabase
-    //         .from('pipe_subscriptions')
-    //         .insert([
-    //             { ...updateData }
-    //         ])
+        let subscriptionStatus = subscriptions.includes(channelId);
 
-    //     if (isValid(writeRes.error)) {
-    //         console.log("Failed while subscribing", writeRes.error);
-    //         return { success: false, error: writeRes.error, ...status }
-    //     }
+        if(subscriptionStatus === false){
+            // add to subscriptions
+            let subscriptionsArr = JSON.parse(subscriptions);
+            subscriptionsArr.push(channelId);
+            await EncryptedStorage.setItem('subscriptions', JSON.stringify(subscriptionsArr));
 
-    //     if (writeRes.status === 201) {
-    //         status.subscribed = true;
-    //     } else {
-    //         console.log("Failed while subscribing", writeRes.error);
-    //     }
+            // update subscriptions count
+            let subscriptionsCountInt = parseInt(subscriptionsCount);
+            await EncryptedStorage.setItem('subscriptions_count', JSON.stringify(subscriptionsCountInt + 1));
 
-    //     // read subscribed count
-    //     const readRes = await supabase
-    //         .from('pipe_users')
-    //         .select()
-    //         .eq('user_id', updateData.user_id)
-    //         .single();
+            returnRes.subscribed = true;
+            returnRes.countUpdated = true;
+        } else if (subscriptionStatus === true) {
+            returnRes.subscribed = false;
+            returnRes.countUpdated = false;
+            returnRes.success = false;
 
-    //     let subscribedCount = readRes.data.channels_subscribed;
+            console.log("Already subscribed to channel", channelId);
+            return returnRes;
+        }
 
-    //     // update subscribed count
-    //     const updateRes = await supabase
-    //         .from('pipe_users')
-    //         .update({ channels_subscribed: subscribedCount + 1 })
-    //         .eq('user_id', updateData.user_id)
-    //         .select()
-    //         .single();
+        returnRes.success = true;
 
-    //     if (isValid(updateRes.error)) {
-    //         console.log("Failed while subscribing", updateRes.error);
-    //         return { success: false, error: updateRes.error, ...status }
-    //     }
+        return returnRes;
+    },
 
-    //     if (updateRes.status === 200) {
-    //         status.countUpdated = true;
-    //     }
+    subscriptionStatus: async (channelId) => {
+        if(!isValid(channelId)) {
+            console.log("Invalid channelId", channelId);
+            return { success: false, subscribed: false };
+        }
 
-    //     return { success: true, ...status };
-    // },
+        // check if already subscribed
+        const subscriptions = await EncryptedStorage.getItem("subscriptions");
 
-    // unsubscribe: async (user_id, uploader_id) => {
-    //     let status = {
-    //         unsubscribed: false,
-    //         countUpdated: false
-    //     }
+        if (subscriptions === null) {
+            console.log("Failed while getting subscriptions", subscriptions);
+            return { success: false, subscribed: false };
+        }
 
-    //     let query = supabase
-    //         .from('pipe_subscriptions')
-    //         .delete('user_id')
+        let subscriptionStatus = subscriptions.includes(channelId);
 
-    //     query = query.eq('user_id', user_id)
-    //     query = query.eq('uploader_id', uploader_id)
-
-    //     const unsubRes = await query
-
-    //     if (isValid(unsubRes.error)) {
-    //         console.log("Failed while unsubscribing", unsubRes.error);
-    //         return { success: false, error: unsubRes.error, ...status };
-    //     }
-
-    //     if (unsubRes.status === 204) {
-    //         status.unsubscribed = true;
-    //     }
-
-    //     // read subscribed count
-    //     const readRes = await supabase
-    //         .from('pipe_users')
-    //         .select()
-    //         .eq('user_id', user_id)
-    //         .single();
-
-    //     let subscribedCount = readRes.data.channels_subscribed;
-
-    //     // update subscribed count
-    //     const updateRes = await supabase
-    //         .from('pipe_users')
-    //         .update({ channels_subscribed: subscribedCount - 1 })
-    //         .eq('user_id', user_id)
-    //         .select()
-    //         .single();
-
-    //     if (updateRes.status === 200) {
-    //         status.countUpdated = true;
-    //     }
-
-    //     return status;
-    // },
-
-    // isSubscribed: async (user_id, uploader_id) => {
-    //     const res = await supabase
-    //         .from('pipe_subscriptions')
-    //         .select('user_id, uploader_id')
-    //         .eq('user_id', user_id)
-    //         .eq('uploader_id', uploader_id)
-
-    //     if (isValid(res.error)) {
-    //         console.log("Failed while checking subscription", res.error);
-    //         return { success: false, error: res.error }
-    //     }
-
-    //     if (res.data.length > 0) {
-    //         return { success: true, subscribed: true }
-    //     }
-
-    //     return { success: true, subscribed: false }
-    // },
+        if(subscriptionStatus === true){
+            return { success: true, subscribed: true };
+        } else if (subscriptionStatus === false) {
+            return { success: true, subscribed: false };
+        }
+    },
 
     metadata: async (uploader_id) => {
         try {
