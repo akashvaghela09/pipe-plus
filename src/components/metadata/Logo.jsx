@@ -18,8 +18,7 @@ export const Logo = () => {
                     zIndex: 99999,
                     transform: [
                         { rotate: '180deg' }
-                    ],
-                    transformOrigin: 'left bottom',
+                    ]
                 }} />
             <View className="bg-slate-100 w-4 h-4 mx-1" />
             <Text className="text-xl font-bold text-slate-100 text-opacity-50 mx-2" >Ozon</Text>
