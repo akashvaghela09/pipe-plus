@@ -1,6 +1,7 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { formatNumbers, formatReadableDate, formatTime, isValid } from '../../utils';
 import { useDispatch } from 'react-redux';
+import FastImage from 'react-native-fast-image';
 import {
     setAvailableQualities,
     setHlsUrl,
@@ -93,7 +94,15 @@ export const VideoCard = ({ video }) => {
         <TouchableOpacity activeOpacity={0.75} onPress={() => handleStreamPlay()}>
             <View className="mb-4">
                 <View className="relative">
-                    <Image source={{ uri: video.thumbnail }} className="w-full aspect-video" />
+                    {/* <Image source={{ uri: video.thumbnail }} className="w-full aspect-video" /> */}
+                    <FastImage
+                        style={{ width: "100%", aspectRatio: 16 / 9 }}
+                        source={{
+                            uri: video.thumbnail,
+                            priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.contain}
+                    />
                     <Text className="absolute bottom-0 right-0 px-1 m-2 rounded-md bg-[#00000080] text-slate-100">{formatTime(video.duration)}</Text>
                 </View>
                 <View className="flex flex-row items-start py-1">
