@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View, StyleSheet } from "react-native";
+import { ScrollView, Text, View, StyleSheet, FlatList } from "react-native";
 import { pipePlus } from "../apis";
 import { IconButton, useTheme } from "react-native-paper";
-import { Button } from "../theme";
 import { Header, VideoCard } from "../components";
 
 export const SubscriptionScreen = () => {
     const { colors } = useTheme();
     const [subscriptionFeed, setSubscriptionFeed] = useState([]);
+    const [visibleFeed, setVisibleFeed] = useState([]);
 
     const fetchFeed = async () => {
         console.log("Fetching subscription feed ...");
@@ -15,19 +15,19 @@ export const SubscriptionScreen = () => {
         let list = await pipePlus.user.subscriptions();
         let totalSubscriptions = list.data.length;
 
-        if(totalSubscriptions === 0) {
+        if (totalSubscriptions === 0) {
             let res = await pipePlus.feed.dummy();
-    
+
             if (res.success === false) {
                 return;
             }
-    
+
             setSubscriptionFeed(res.data);
             return;
         }
 
         let res = await pipePlus.feed.subscriptionBased(list.data);
-        
+
         if (res.success === false) {
             return;
         }
@@ -37,16 +37,25 @@ export const SubscriptionScreen = () => {
         setSubscriptionFeed(feed);
     }
 
+    const loadMoreItems = () => {
+        const nextItems = subscriptionFeed.slice(visibleFeed.length, visibleFeed.length + 20); // Load next 20 items
+        setVisibleFeed([...visibleFeed, ...nextItems]);
+    };
+
     useEffect(() => {
         fetchFeed();
     }, []);
 
+    useEffect(() => {
+        setVisibleFeed(subscriptionFeed.slice(0, 10));
+    }, [subscriptionFeed]);
+
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: '#0f0f0f' }}>
+        <View style={{ flex: 1, backgroundColor: '#0f0f0f' }}>
             {/* Header section with logo and icons */}
             <Header />
-                {
-                subscriptionFeed.length === 0 &&
+            {
+                visibleFeed.length === 0 &&
                 <View className="flex justify-center items-center h-screen">
                     <IconButton
                         icon="alert-circle-outline"
@@ -58,14 +67,18 @@ export const SubscriptionScreen = () => {
             }
 
             {
-                subscriptionFeed.length > 0 &&
-                subscriptionFeed.map((video, index) => {
-                    return (
-                            <VideoCard key={video.id} video={video} />
-                    )
-                })
+                visibleFeed.length > 0 &&
+                <FlatList
+                    data={visibleFeed}
+                    keyExtractor={(item, index) => item.id}
+                    renderItem={({ item }) => (
+                        <VideoCard key={item.id} video={item} />
+                    )}
+                    onEndReached={loadMoreItems}
+                    onEndReachedThreshold={0.95} // Load more items when the end of the list is halfway visible
+                />
             }
-        </ScrollView>
+        </View>
     )
 };
 
