@@ -1,6 +1,6 @@
 import { config } from "../configs/config";
 import axios from "axios";
-import { supabase } from "../configs/supabase-config";
+// import { supabase } from "../configs/supabase-config";
 import { isValid } from "../utils";
 
 export const stream = {
@@ -87,104 +87,104 @@ export const stream = {
         return data;
     },
 
-    addPlayed: async (streamData) => {
-        let available = false;
-        const { user_id, stream_id } = streamData;
+    // addPlayed: async (streamData) => {
+    //     let available = false;
+    //     const { user_id, stream_id } = streamData;
 
-        let query = supabase
-            .from('pipe_videos')
-            .select()
+    //     let query = supabase
+    //         .from('pipe_videos')
+    //         .select()
 
-        query = query.eq('user_id', user_id)
-        query = query.eq('stream_id', stream_id)
+    //     query = query.eq('user_id', user_id)
+    //     query = query.eq('stream_id', stream_id)
 
-        const readRes = await query;
+    //     const readRes = await query;
 
-        if (isValid(readRes.error)) {
-            console.log("Failed while getting stream played or not", readRes.error);
-            return { success: false, error: readRes.error };
-        }
+    //     if (isValid(readRes.error)) {
+    //         console.log("Failed while getting stream played or not", readRes.error);
+    //         return { success: false, error: readRes.error };
+    //     }
 
-        if (readRes.data.length === 0 && readRes.error === null) {
-            available = false;
-        } else if (readRes.data.length > 0 && readRes.error === null) {
-            available = true;
-        }
+    //     if (readRes.data.length === 0 && readRes.error === null) {
+    //         available = false;
+    //     } else if (readRes.data.length > 0 && readRes.error === null) {
+    //         available = true;
+    //     }
 
-        if (available === false) {
-            const writeRes = await supabase
-                .from('pipe_videos')
-                .insert([{ ...streamData }])
-                .select()
-            if (isValid(writeRes.error)) {
-                console.log("Failed while adding new stream played", writeRes.error);
-                return { success: false, error: writeRes.error };
-            }
+    //     if (available === false) {
+    //         const writeRes = await supabase
+    //             .from('pipe_videos')
+    //             .insert([{ ...streamData }])
+    //             .select()
+    //         if (isValid(writeRes.error)) {
+    //             console.log("Failed while adding new stream played", writeRes.error);
+    //             return { success: false, error: writeRes.error };
+    //         }
 
-            return { success: true, data: writeRes.data, progress: writeRes.data[0].progress };
-        } else if (available === true) {
-            return { success: true, data: readRes.data, progress: readRes.data[0].progress };
-        }
-    },
+    //         return { success: true, data: writeRes.data, progress: writeRes.data[0].progress };
+    //     } else if (available === true) {
+    //         return { success: true, data: readRes.data, progress: readRes.data[0].progress };
+    //     }
+    // },
 
-    removeFromHistory: async (streamUuid) => {
-        const { data, error } = await supabase
-            .from('pipe_videos')
-            .update({ progress: 0, watched: false })
-            .eq('uuid', streamUuid)
-            .select()
-        if (isValid(error)) {
-            console.log("Failed while removing stream from history", error);
-            return { success: false, error };
-        }
+    // removeFromHistory: async (streamUuid) => {
+    //     const { data, error } = await supabase
+    //         .from('pipe_videos')
+    //         .update({ progress: 0, watched: false })
+    //         .eq('uuid', streamUuid)
+    //         .select()
+    //     if (isValid(error)) {
+    //         console.log("Failed while removing stream from history", error);
+    //         return { success: false, error };
+    //     }
 
-        return { success: true, data };
-    },
+    //     return { success: true, data };
+    // },
 
-    updatePlayed: async ({ streamUuid, progressAmount, watched }) => {
-        const { data, error } = await supabase
-            .from('pipe_videos')
-            .update({ progress: progressAmount, watched: watched })
-            .eq('uuid', streamUuid)
-            .select()
+    // updatePlayed: async ({ streamUuid, progressAmount, watched }) => {
+    //     const { data, error } = await supabase
+    //         .from('pipe_videos')
+    //         .update({ progress: progressAmount, watched: watched })
+    //         .eq('uuid', streamUuid)
+    //         .select()
 
-        if (isValid(error)) {
-            console.log("Failed while updating stream played", error);
-            return { success: false, error };
-        }
+    //     if (isValid(error)) {
+    //         console.log("Failed while updating stream played", error);
+    //         return { success: false, error };
+    //     }
 
-        return { success: true, data };
-    },
+    //     return { success: true, data };
+    // },
 
-    like: async ({ streamUuid }) => {
-        const { data, error } = await supabase
-            .from('pipe_videos')
-            .update({ liked: true })
-            .eq('uuid', streamUuid)
-            .select()
+    // like: async ({ streamUuid }) => {
+    //     const { data, error } = await supabase
+    //         .from('pipe_videos')
+    //         .update({ liked: true })
+    //         .eq('uuid', streamUuid)
+    //         .select()
 
-        if (isValid(error)) {
-            console.log("Failed while updating dislike", error);
-            return { success: false, error };
-        }
+    //     if (isValid(error)) {
+    //         console.log("Failed while updating dislike", error);
+    //         return { success: false, error };
+    //     }
 
-        return { success: true, data };
-    },
+    //     return { success: true, data };
+    // },
 
-    dislike: async ({ streamUuid }) => {
-        const { data, error } = await supabase
-            .from('pipe_videos')
-            .update({ liked: false })
-            .eq('uuid', streamUuid)
-            .select()
+    // dislike: async ({ streamUuid }) => {
+    //     const { data, error } = await supabase
+    //         .from('pipe_videos')
+    //         .update({ liked: false })
+    //         .eq('uuid', streamUuid)
+    //         .select()
 
-        if (isValid(error)) {
-            console.log("Failed while updating dislike", error);
-            return { success: false, error };
-        }
+    //     if (isValid(error)) {
+    //         console.log("Failed while updating dislike", error);
+    //         return { success: false, error };
+    //     }
 
-        return { success: true, data };
-    },
+    //     return { success: true, data };
+    // },
 
     comments: {
         get: async (streamId) => {
@@ -228,36 +228,36 @@ export const stream = {
     },
 
     watchLater: {
-        add: async ({ streamUuid }) => {
-            const { data, error } = await supabase
-                .from('pipe_videos')
-                .update({ watch_later: true })
-                .eq('uuid', streamUuid)
-                .select()
+        // add: async ({ streamUuid }) => {
+        //     const { data, error } = await supabase
+        //         .from('pipe_videos')
+        //         .update({ watch_later: true })
+        //         .eq('uuid', streamUuid)
+        //         .select()
 
-            if (isValid(error)) {
-                console.log("Failed while updating watch_later", error);
-                return { success: false, error };
-            }
+        //     if (isValid(error)) {
+        //         console.log("Failed while updating watch_later", error);
+        //         return { success: false, error };
+        //     }
 
-            return { success: true, data };
-        },
+        //     return { success: true, data };
+        // },
 
-        remove: async ({ streamUuid }) => {
-            const { data, error } = await supabase
-                .from('pipe_videos')
-                .update({ watch_later: false })
-                .eq('uuid', streamUuid)
-                .select()
+        // remove: async ({ streamUuid }) => {
+        //     const { data, error } = await supabase
+        //         .from('pipe_videos')
+        //         .update({ watch_later: false })
+        //         .eq('uuid', streamUuid)
+        //         .select()
 
-            if (isValid(error)) {
-                console.log("Failed while updating watch_later", error);
-                return { success: false, error };
-            }
+        //     if (isValid(error)) {
+        //         console.log("Failed while updating watch_later", error);
+        //         return { success: false, error };
+        //     }
 
-            return { success: true, data };
+        //     return { success: true, data };
 
-        },
+        // },
     }
 };
 

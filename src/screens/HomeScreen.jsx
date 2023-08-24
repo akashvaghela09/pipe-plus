@@ -1,56 +1,88 @@
 import { useEffect, useState } from "react";
-import { ScrollView } from "react-native";
-import axios from "axios";
-import { config } from "../configs/config";
-import { VideoCard } from "../components/ui/VideoCard";
-import { v4 as uuid } from 'uuid';
+import { View, Text, FlatList } from "react-native";
+import { Header, VideoCard } from "../components/";
+import { useNavigation } from '@react-navigation/native';
+import { pipePlus } from "../apis";
+import { shuffleArray } from "../utils";
+import { IconButton } from "react-native-paper";
 
 export const HomeScreen = () => {
-
+    const navigation = useNavigation();
     const [feedData, setFeedData] = useState([]);
+    const [visibleFeed, setVisibleFeed] = useState([]);
 
-    const fetchDummyFeed = async () => {
-        console.log("Fetching dummy feed data");
-        let data = null;
+    const fetchFeed = async () => {
+        console.log("Fetching feed data...");
 
-        let channelList = [
-            "UC4QZ_LsYcvcq7qOsOhpAX4A",
-            "UCtZO3K2p8mqFwiKWb9k7fXA",
-            "UCH4BNI0-FOK2dMXoFtViWHw",
-            "UCsooa4yRKGN_zEE8iknghZA",
-            "UCsXVk37bltHxD1rDPwtNM8Q"
-        ]
+        let list = await pipePlus.user.subscriptions();
+        let totalSubscriptions = list.data.length;
 
-        try {
-            let res = await axios.get(`${config.baseUrl}/feed/unauthenticated?channels=${channelList.join(",")}`);
-            data = [...res.data];
+        if (totalSubscriptions === 0) {
+            let res = await pipePlus.feed.dummy();
 
-            data = data.map((feed) => {
-                return {
-                    id: uuid(),
-                    ...feed
-                }
-            });
+            if (res.success === false) {
+                return;
+            }
 
-            setFeedData([...data]);
-        } catch (error) {
-            console.log("Failed while fetching dummy feed data", error);
+            setFeedData(res.data);
+            return;
         }
+
+        let res = await pipePlus.feed.subscriptionBased(list.data);
+
+        if (res.success === false) {
+            return;
+        }
+
+        let feed = [...shuffleArray(res.data)];
+        setFeedData(feed);
+    }
+
+    const loadMoreItems = () => {
+        const nextItems = feedData.slice(visibleFeed.length, visibleFeed.length + 20); // Load next 20 items
+        setVisibleFeed([...visibleFeed, ...nextItems]);
     };
 
     useEffect(() => {
-        fetchDummyFeed();
+        fetchFeed();
     }, []);
 
+    useEffect(() => {
+        setVisibleFeed(feedData.slice(0, 10));
+    }, [feedData]);
+
     return (
-        <ScrollView className="h-screen bg-[#0f0f0f]">
+        <View style={{ flex: 1, backgroundColor: '#0f0f0f' }}>
+            {/* Header section with logo and icons */}
+            <Header />
+
+            {/* Feed section */}
             {
-                feedData.length > 0 && feedData.map((stream) => {
-                    return (
-                        <VideoCard key={stream.id} video={stream} />
-                    )
-                })
+                visibleFeed.length > 0 &&
+                <FlatList
+                    data={visibleFeed}
+                    keyExtractor={(item, index) => item.id}
+                    renderItem={({ item }) => (
+                        <VideoCard key={item.id} video={item} />
+                    )}
+                    onEndReached={loadMoreItems}
+                    onEndReachedThreshold={0.95} // Load more items when the end of the list is halfway visible
+                />
             }
-        </ScrollView>
+
+            {
+                visibleFeed.length === 0 &&
+                <View className="bg-[#0f0f0f]">
+                    <View className="flex justify-center items-center h-screen">
+                        <IconButton
+                            icon="alert-circle-outline"
+                            color="#212121"
+                            size={80}
+                        />
+                        <Text className="text-2xl font-bold text-slate-100 text-opacity-50">No Channels/Feed found 😢</Text>
+                    </View>
+                </View>
+            }
+        </View>
     )
 };

@@ -3,7 +3,8 @@ import { Text, View, StyleSheet } from "react-native";
 import BottomSheet from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSelector, useDispatch } from 'react-redux';
-import { setSettingsOpen } from '../../../redux/player/playerSlice';
+import { setSettingsOpen } from '../../redux/player/playerSlice';
+
 export const PlayerSettings = () => {
     const dispatch = useDispatch();
     const bottomSheetRef = useRef(null);

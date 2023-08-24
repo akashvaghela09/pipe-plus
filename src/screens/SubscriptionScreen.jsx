@@ -1,11 +1,87 @@
-import { ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ScrollView, Text, View, StyleSheet, FlatList } from "react-native";
+import { pipePlus } from "../apis";
+import { IconButton, useTheme } from "react-native-paper";
+import { Header, VideoCard } from "../components";
 
 export const SubscriptionScreen = () => {
+    const { colors } = useTheme();
+    const [subscriptionFeed, setSubscriptionFeed] = useState([]);
+    const [visibleFeed, setVisibleFeed] = useState([]);
+
+    const fetchFeed = async () => {
+        console.log("Fetching subscription feed ...");
+
+        let list = await pipePlus.user.subscriptions();
+        let totalSubscriptions = list.data.length;
+
+        if (totalSubscriptions === 0) {
+            let res = await pipePlus.feed.dummy();
+
+            if (res.success === false) {
+                return;
+            }
+
+            setSubscriptionFeed(res.data);
+            return;
+        }
+
+        let res = await pipePlus.feed.subscriptionBased(list.data);
+
+        if (res.success === false) {
+            return;
+        }
+
+        let feed = [...res.data];
+
+        setSubscriptionFeed(feed);
+    }
+
+    const loadMoreItems = () => {
+        const nextItems = subscriptionFeed.slice(visibleFeed.length, visibleFeed.length + 20); // Load next 20 items
+        setVisibleFeed([...visibleFeed, ...nextItems]);
+    };
+
+    useEffect(() => {
+        fetchFeed();
+    }, []);
+
+    useEffect(() => {
+        setVisibleFeed(subscriptionFeed.slice(0, 10));
+    }, [subscriptionFeed]);
+
     return (
-        <ScrollView className="h-screen">
-            <View className="flex justify-center items-center h-screen">
-                <Text className="text-3xl font-bold">Subscription Screen</Text>
-            </View>
-        </ScrollView>
+        <View style={{ flex: 1, backgroundColor: '#0f0f0f' }}>
+            {/* Header section with logo and icons */}
+            <Header />
+            {
+                visibleFeed.length === 0 &&
+                <View className="flex justify-center items-center h-screen">
+                    <IconButton
+                        icon="alert-circle-outline"
+                        color="#212121"
+                        size={80}
+                    />
+                    <Text className="text-2xl font-bold text-slate-100 text-opacity-50">No subscriptions found 😢</Text>
+                </View>
+            }
+
+            {
+                visibleFeed.length > 0 &&
+                <FlatList
+                    data={visibleFeed}
+                    keyExtractor={(item, index) => item.id}
+                    renderItem={({ item }) => (
+                        <VideoCard key={item.id} video={item} />
+                    )}
+                    onEndReached={loadMoreItems}
+                    onEndReachedThreshold={0.95} // Load more items when the end of the list is halfway visible
+                />
+            }
+        </View>
     )
 };
+
+const styles = StyleSheet.create({
+
+});

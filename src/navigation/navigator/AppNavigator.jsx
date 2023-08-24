@@ -4,8 +4,9 @@ import EntypoIcons from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { enableScreens } from 'react-native-screens';
-import { HomeScreen, SubscriptionScreen, GroupScreen, LibraryScreen } from '../screens';
-import { TabBar } from './TabBar';
+import { GroupStackNavigator, LibraryStackNavigator, SubscriptionStackNavigator, TabBar } from '../';
+import { HomeStackNavigator } from '../';
+
 // Optimize screen performance
 enableScreens();
 
@@ -23,7 +24,7 @@ export const screenOptions = (route, color) => {
     }
 };
 
-function AppNavigator() {
+export const AppNavigator = () => {
     return (
         <NavigationContainer>
             <Tab.Navigator
@@ -31,15 +32,15 @@ function AppNavigator() {
             >
                 <Tab.Screen
                     name="Home"
-                    component={HomeScreen}
+                    component={HomeStackNavigator}
                     options={{
+                        tabBarLabel: 'Home',
                         title: 'Home',
                         headerShown: false,
-                    }}
-                />
+                    }} />
                 <Tab.Screen
                     name="Subscription"
-                    component={SubscriptionScreen}
+                    component={SubscriptionStackNavigator}
                     options={{
                         tabBarLabel: 'Subscription',
                         title: 'Subscription',
@@ -47,26 +48,21 @@ function AppNavigator() {
                     }} />
                 <Tab.Screen
                     name="Group"
-                    component={GroupScreen}
+                    component={GroupStackNavigator}
                     options={{
                         tabBarLabel: 'Group',
                         title: 'Group',
-                        headerShown: false
+                        headerShown: false,
                     }} />
                 <Tab.Screen
                     name="Library"
-                    component={LibraryScreen}
+                    component={LibraryStackNavigator}
                     options={{
                         tabBarLabel: 'Library',
                         title: 'Library',
                         headerShown: false,
-                        style: {
-                            color: "white"
-                        }
                     }} />
             </Tab.Navigator>
         </NavigationContainer>
     );
 }
-
-export default AppNavigator;

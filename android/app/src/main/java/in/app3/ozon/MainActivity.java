@@ -1,4 +1,4 @@
-package com.pipeplus;
+package in.app3.ozon;
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity;
@@ -15,7 +15,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "PipePlus";
+    return "Ozon";
   }
 
   @Override

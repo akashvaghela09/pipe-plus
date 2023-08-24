@@ -1,22 +1,25 @@
 import { useEffect, useState, useRef } from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, Button as RNButton } from 'react-native';
-import { ActivityIndicator, Button, IconButton, TouchableRipple } from 'react-native-paper';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { ActivityIndicator, IconButton, TouchableRipple } from 'react-native-paper';
+import { Button } from "../../theme/";
 import { useSelector, useDispatch } from 'react-redux';
-import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setSettingsOpen } from '../../../redux/player/playerSlice';
+import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setSettingsOpen } from '../../redux/player/playerSlice';
 import Video from 'react-native-video';
 import { BackHandler } from 'react-native';
 import Slider from '@react-native-community/slider';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { formatNumbers, formatReadableDate, formatTime } from '../../../utils';
-import { VideoCard } from '../VideoCard';
-
+import { formatNumbers, formatReadableDate, formatTime, isValid } from '../../utils';
+import { VideoCard } from '../';
+import { useTheme } from 'react-native-paper';
+import { pipePlus } from '../../apis';
 export const Player = ({ navigator }) => {
     const dispatch = useDispatch();
-
+    const { colors } = useTheme();
     const {
         isFullScreen,
         isVisible,
         streamUrl,
+        hlsUrl,
         size,
         isPlaying,
         isLoading,
@@ -30,7 +33,8 @@ export const Player = ({ navigator }) => {
         uploaded,
         uploadedDate,
         uploaderName,
-        uploaderSubscriberCount
+        uploaderSubscriberCount,
+        uploaderUrl
     } = streamMetadata;
 
     const [played, setPlayed] = useState(0);
@@ -43,6 +47,8 @@ export const Player = ({ navigator }) => {
     const [isRippleVisible, setRippleVisible] = useState(false);
     const [seekSide, setSeekSide] = useState(null);
     const [sliderTimer, setSliderTimer] = useState(null);
+    const [subscribed, setSubscribed] = useState(false);
+    const [channelId, setChannelId] = useState(null);
 
     const handlePlayback = (status) => {
         dispatch(setIsPlaying(status));
@@ -133,6 +139,32 @@ export const Player = ({ navigator }) => {
         dispatch(setSettingsOpen(true));
     }
 
+    const handleSubscribe = async () => {
+        let data = await pipePlus.channel.subscribe(channelId);
+        if (data.success === true) {
+            setSubscribed(true);
+        }
+    }
+
+    const handleUnsubscribe = async () => {
+        let data = await pipePlus.channel.unsubscribe(channelId);
+        if (data.success === true) {
+            setSubscribed(false);
+        }
+    }
+
+    const checkSubscription = async () => {
+        const id = uploaderUrl?.split("/channel/")[1];
+        setChannelId(id);
+
+        let status = await pipePlus.channel.subscriptionStatus(id);
+        if (status.subscribed === true) {
+            setSubscribed(true);
+        } else {
+            setSubscribed(false);
+        }
+    }
+
     useEffect(() => {
         const backAction = () => {
             if (size === "normal") {
@@ -168,6 +200,10 @@ export const Player = ({ navigator }) => {
         };
     }, [isSliderVisible]);
 
+    useEffect(() => {
+            checkSubscription();
+    }, [subscribed, streamMetadata.uploaderUrl]);
+
     return (
         isVisible &&
         <TouchableOpacity activeOpacity={size === "small" ? 0.7 : 1} onPress={() => handlePlayerClick()}>
@@ -185,6 +221,7 @@ export const Player = ({ navigator }) => {
                             >
                                 <View style={styles.videoWrapper}>
                                     <Video
+                                        // source={{ uri: hlsUrl }}
                                         source={{ uri: streamUrl }}
                                         ref={videoRef}
                                         style={size === "small" ? styles.videoSmall : styles.videoNormal}
@@ -308,9 +345,12 @@ export const Player = ({ navigator }) => {
                                     </View>
                                 </View>
 
-                                <Button mode='elevated' textColor='black' buttonColor='white'>
-                                    Subscribe
-                                </Button>
+                                <Button
+                                    title={subscribed ? "Unsubscribe" : "Subscribe"}
+                                    onPress={() => subscribed ? handleUnsubscribe() : handleSubscribe()}
+                                    labelStyle={{ color: subscribed ? "white" : "black" }}
+                                    style={{ backgroundColor: subscribed ? colors.primary : "white" }}
+                                />
                             </View>
                         </View>
                     }

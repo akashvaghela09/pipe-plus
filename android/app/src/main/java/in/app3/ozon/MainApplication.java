@@ -1,4 +1,4 @@
-package com.pipeplus;
+package in.app3.ozon;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

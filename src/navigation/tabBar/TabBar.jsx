@@ -1,14 +1,17 @@
-import { useState } from 'react';
 import { View, Text } from 'react-native';
 import { TouchableRipple } from 'react-native-paper';
-import { screenOptions } from './AppNavigator'; // Assuming both files are in the same directory
-import { Player } from '../components/ui/player/Player';
-import { PlayerSettings } from '../components/ui/bottomSheet/PlayerSettings';
+import { screenOptions } from '../'; // Assuming both files are in the same directory
+import { PlayerSettings, Player } from '../../components/';
 import { useSelector } from 'react-redux';
 
 export const TabBar = ({ state, descriptors, navigation }) => {
 
+    const stackIndex = state.routes[state.index].state?.index;
+    const stackRoute = state.routes[state.index]?.state?.routes[stackIndex];
+    const stackRouteName = stackRoute?.name;
+
     const { settingsOpen } = useSelector(state => state.player);
+    const { tabBarVisible } = useSelector(state => state.app);
 
     return (
         <>
@@ -41,6 +44,15 @@ export const TabBar = ({ state, descriptors, navigation }) => {
                             navigation.navigate(route.name);
                         }
                     };
+
+                    // Hide tab bar based on route name
+                    // if (stackRouteName === "search") {
+                    //     return null;
+                    // }
+
+                    if(!tabBarVisible){
+                        return null;
+                    }
 
                     return (
                         <TouchableRipple
