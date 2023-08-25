@@ -3,12 +3,14 @@ import { TouchableRipple } from 'react-native-paper';
 import { screenOptions } from '../'; // Assuming both files are in the same directory
 import { PlayerSettings, Player } from '../../components/';
 import { useSelector } from 'react-redux';
+import { useTheme } from 'react-native-paper';
 
 export const TabBar = ({ state, descriptors, navigation }) => {
-
-    const stackIndex = state.routes[state.index].state?.index;
-    const stackRoute = state.routes[state.index]?.state?.routes[stackIndex];
-    const stackRouteName = stackRoute?.name;
+    const { colors } = useTheme();
+    // const stackIndex = state.routes[state.index].state?.index;
+    // const stackRoute = state.routes[state.index]?.state?.routes[stackIndex];
+    // const stackRouteName = stackRoute?.name;
+    // const tabName = state.routes[state.index].name;
 
     const { settingsOpen } = useSelector(state => state.player);
     const { tabBarVisible } = useSelector(state => state.app);
@@ -31,7 +33,7 @@ export const TabBar = ({ state, descriptors, navigation }) => {
 
                     const isFocused = state.index === index;
 
-                    const IconComponent = screenOptions(route, isFocused ? 'white' : '#14532d');
+                    const IconComponent = screenOptions(route, isFocused ? colors.blue500 : colors.slate300);
 
                     const onPress = () => {
                         const event = navigation.emit({
@@ -64,7 +66,7 @@ export const TabBar = ({ state, descriptors, navigation }) => {
                         >
                             <View style={{ alignItems: 'center' }}>
                                 {IconComponent}
-                                <Text style={{ color: isFocused ? 'white' : '#f1f5f9', fontSize: 10 }}>
+                                <Text style={{ color: isFocused ? colors.blue500 : colors.slate300, fontSize: 10 }}>
                                     {label}
                                 </Text>
                             </View>

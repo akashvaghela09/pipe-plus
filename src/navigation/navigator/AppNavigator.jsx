@@ -14,13 +14,13 @@ const Tab = createBottomTabNavigator();
 
 export const screenOptions = (route, color) => {
     if (route.name === 'Group') {
-        return <EntypoIcons name={"folder-video"} color={color} size={20} style={{ color: "white" }} />
+        return <EntypoIcons name={"folder-video"} color={color} size={20} />
     } else if (route.name === 'Subscription') {
-        return <MaterialCommunityIcons name={"youtube-subscription"} color={color} size={20} style={{ color: "white" }} />;
+        return <MaterialCommunityIcons name={"youtube-subscription"} color={color} size={20} />;
     } else if (route.name === 'Home') {
-        return <MaterialCommunityIcons name={"home-variant"} color={color} size={20} style={{ color: "white" }} />;
+        return <MaterialCommunityIcons name={"home-variant"} color={color} size={20} />;
     } else if (route.name === 'Library') {
-        return <MaterialIcons name={"video-library"} color={color} size={20} style={{ color: "white" }} />;
+        return <MaterialIcons name={"video-library"} color={color} size={20} />;
     }
 };
 
