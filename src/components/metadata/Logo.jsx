@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import Fontisto from 'react-native-vector-icons/Fontisto'
 import { useTheme } from "react-native-paper"
 
@@ -11,17 +11,27 @@ export const Logo = () => {
                 name="youtube-play"
                 size={21}
                 color={colors.blue500}
-                style={{
-                    position: "absolute",
-                    left: 7,
-                    top: 4,
-                    zIndex: 99999,
-                    transform: [
-                        { rotate: '180deg' }
-                    ]
-                }} />
-            <View className="bg-slate-100 w-4 h-4 mx-1" />
-            <Text className="text-xl font-bold text-slate-100 text-opacity-50 mx-2" >Ozon</Text>
+                style={styles.logoIcon} />
+            <View className="bg-slate-100 w-5 h-4" />
+            <Text style={{...styles.title, color: colors.neutral100}}>Ozon</Text>
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    logoIcon: {
+        position: "absolute",
+        left: 7,
+        top: 6,
+        zIndex: 99999,
+        transform: [
+            { rotate: '180deg' }
+        ]
+    },
+    title: {
+        fontFamily: 'LeagueGothic-Regular',
+        fontSize: 25,
+        margin: 0,
+        marginLeft: 12
+    }
+})
