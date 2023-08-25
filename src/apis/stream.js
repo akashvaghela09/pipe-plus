@@ -9,7 +9,7 @@ export const stream = {
         let data = null;
 
         try {
-            let res = await axios.get(`${config.baseUrl}/streams/${streamId}`);
+            let res = await axios.get(`${config.streamUrl}/streams/${streamId}`);
 
             let resourceList = [];
 

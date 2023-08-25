@@ -12,8 +12,7 @@ import {
     setStreamMetadata,
     setStreamUrl
 } from '../../redux/player/playerSlice';
-import axios from 'axios';
-import { config } from '../../configs/config';
+import { pipePlus } from '../../apis';
 
 export const VideoCard = ({ video }) => {
     const dispatch = useDispatch();
@@ -65,28 +64,28 @@ export const VideoCard = ({ video }) => {
         let validUrl = "";
         let hlsUrl = "";
 
-        let res = await axios.get(`${config.baseUrl}/streams/${stream.streamId}`);
+        let res = await pipePlus.stream.get(stream.streamId);
 
-        if (!isValid(res.data)) {
+        if (!isValid(res)) {
             console.log("Stream data is invalid");
             return;
         }
 
-        res.data.videoStreams.forEach((item) => {
+        res.videoStreams.forEach((item) => {
             if (item.mimeType === "video/mp4" && item.videoOnly === false) {
                 validQuality.push(item);
             }
         });
 
         validUrl = validQuality[0].url;
-        hlsUrl = res.data.hls;
-        stream.uploaderSubscriberCount = res.data.uploaderSubscriberCount;
+        hlsUrl = res.hls;
+        stream.uploaderSubscriberCount = res.uploaderSubscriberCount;
 
         dispatch(setStreamMetadata(stream));
         dispatch(setStreamUrl(validUrl));
         dispatch(setHlsUrl(hlsUrl));
         dispatch(setAvailableQualities(validQuality));
-        dispatch(setRelatedStreams(res.data.relatedStreams));
+        dispatch(setRelatedStreams(res.relatedStreams));
         dispatch(setLoading(false));
     }
 
