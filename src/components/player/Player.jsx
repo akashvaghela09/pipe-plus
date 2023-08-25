@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, StatusBar } from 'react-native';
 import { ActivityIndicator, IconButton, TouchableRipple } from 'react-native-paper';
 import { Button } from "../../theme/";
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,6 +13,7 @@ import { VideoCard } from '../';
 import { useTheme } from 'react-native-paper';
 import { pipePlus } from '../../apis';
 import { setTabBarVisible } from '../../redux/app/appSlice';
+import Orientation from 'react-native-orientation-locker';
 
 export const Player = ({ navigator }) => {
     const dispatch = useDispatch();
@@ -51,6 +52,8 @@ export const Player = ({ navigator }) => {
     const [sliderTimer, setSliderTimer] = useState(null);
     const [subscribed, setSubscribed] = useState(false);
     const [channelId, setChannelId] = useState(null);
+    const deviceWidth = Dimensions.get('window').width;
+    const deviceHeight = Dimensions.get('window').height;
 
     const handlePlayback = (status) => {
         dispatch(setIsPlaying(status));
@@ -168,17 +171,28 @@ export const Player = ({ navigator }) => {
     }
 
     const handleFullScreen = () => {
-        if(isFullScreen === false) {
+        if (isFullScreen === false) {
             dispatch(setTabBarVisible(false));
             dispatch(setIsFullScreen(true));
-        } else {
+            Orientation.lockToLandscape();
+            StatusBar.setHidden(true);
+        } else if (isFullScreen === true) {
             dispatch(setTabBarVisible(true));
             dispatch(setIsFullScreen(false));
+            Orientation.lockToPortrait();
+            StatusBar.setHidden(false);
         }
     }
 
     useEffect(() => {
         const backAction = () => {
+            console.log("back button pressed");
+
+            if (isFullScreen === true) {
+                handleFullScreen();
+                return true;
+            }
+
             if (size === "normal") {
                 dispatch(setSize("small"));
                 console.log("minimize app");
@@ -198,7 +212,7 @@ export const Player = ({ navigator }) => {
         );
 
         return () => backHandler.remove();
-    }, [size, isVisible]);
+    }, [size, isVisible, isFullScreen]);
 
     useEffect(() => {
         if (isSliderVisible === true) {
@@ -213,7 +227,7 @@ export const Player = ({ navigator }) => {
     }, [isSliderVisible]);
 
     useEffect(() => {
-            checkSubscription();
+        checkSubscription();
     }, [subscribed, streamMetadata.uploaderUrl]);
 
     return (
@@ -236,8 +250,12 @@ export const Player = ({ navigator }) => {
                                         // source={{ uri: hlsUrl }}
                                         source={{ uri: streamUrl }}
                                         ref={videoRef}
-                                        style={size === "small" ? styles.videoSmall : styles.videoNormal}
-                                        currentPlaybackTime={10}
+                                        style={isFullScreen === true ? {
+                                            width: deviceWidth,
+                                            height: deviceHeight,
+                                        } :
+                                            (size === "small" ? styles.videoSmall : styles.videoNormal)
+                                        }
                                         resizeMode="contain"
                                         playInBackground={true}     // Continue playing when app goes into background
                                         playWhenInactive={true}    // Continue playing on interactions like notifications
