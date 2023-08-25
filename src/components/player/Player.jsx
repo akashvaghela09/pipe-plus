@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { ActivityIndicator, IconButton, TouchableRipple } from 'react-native-paper';
 import { Button } from "../../theme/";
 import { useSelector, useDispatch } from 'react-redux';
@@ -12,6 +12,8 @@ import { formatNumbers, formatReadableDate, formatTime, isValid } from '../../ut
 import { VideoCard } from '../';
 import { useTheme } from 'react-native-paper';
 import { pipePlus } from '../../apis';
+import { setTabBarVisible } from '../../redux/app/appSlice';
+
 export const Player = ({ navigator }) => {
     const dispatch = useDispatch();
     const { colors } = useTheme();
@@ -165,6 +167,16 @@ export const Player = ({ navigator }) => {
         }
     }
 
+    const handleFullScreen = () => {
+        if(isFullScreen === false) {
+            dispatch(setTabBarVisible(false));
+            dispatch(setIsFullScreen(true));
+        } else {
+            dispatch(setTabBarVisible(true));
+            dispatch(setIsFullScreen(false));
+        }
+    }
+
     useEffect(() => {
         const backAction = () => {
             if (size === "normal") {
@@ -245,7 +257,7 @@ export const Player = ({ navigator }) => {
                                                 <TouchableRipple rippleColor={isRippleVisible ? "rgba(0, 0, 0, .32)" : "rgba(0, 0, 0, 0)"} onPress={() => handleDoubleTap('left')} className="w-1/2 h-full flex justify-center items-center">
                                                     {
                                                         (isRippleVisible && seekSide === "left") ?
-                                                            <MaterialCommunityIcon name="rewind-15" size={30} color="#fff" />
+                                                            <MaterialCommunityIcon name="rewind-15" size={30} color={colors.slate100} />
                                                             :
                                                             <View />
                                                     }
@@ -255,17 +267,17 @@ export const Player = ({ navigator }) => {
                                                 {
                                                     isPlaying === true ?
                                                         <IconButton
-                                                            icon="play"
+                                                            icon={() => <MaterialCommunityIcon name="play" size={70} color={colors.slate100} />}
                                                             size={70}
                                                             onPress={() => handlePlayback(false)}
-                                                            style={{ ...styles.controlIcon }}
+                                                            style={{ ...styles.controlIcon, color: colors.slate100 }}
                                                         />
                                                         :
                                                         <IconButton
-                                                            icon="pause"
+                                                            icon={() => <MaterialCommunityIcon name="pause" size={70} color={colors.slate100} />}
                                                             size={70}
                                                             onPress={() => handlePlayback(true)}
-                                                            style={{ ...styles.controlIcon }}
+                                                            style={{ ...styles.controlIcon, color: colors.slate100 }}
                                                         />
                                                 }
 
@@ -273,7 +285,7 @@ export const Player = ({ navigator }) => {
                                                 <TouchableRipple rippleColor={isRippleVisible ? "rgba(0, 0, 0, .32)" : "rgba(0, 0, 0, 0)"} onPress={() => handleDoubleTap('right')} className="w-1/2 h-full flex justify-center items-center">
                                                     {
                                                         (isRippleVisible && seekSide === "right") ?
-                                                            <MaterialCommunityIcon name="fast-forward-15" size={30} color="#fff" />
+                                                            <MaterialCommunityIcon name="fast-forward-15" size={30} color={colors.slate100} />
                                                             :
                                                             <View />
                                                     }
@@ -281,23 +293,23 @@ export const Player = ({ navigator }) => {
 
                                                 {/* Fullscreen button */}
                                                 <IconButton
-                                                    icon={!isFullScreen ? 'fullscreen-exit' : 'fullscreen'}
+                                                    icon={() => <MaterialCommunityIcon name={isFullScreen ? 'fullscreen-exit' : 'fullscreen'} size={30} color={colors.slate100} />}
                                                     size={30}
                                                     style={{ position: 'absolute', bottom: 5, right: 5 }}
-                                                    onPress={() => alert("Fullscreen")}
+                                                    onPress={() => handleFullScreen()}
                                                 />
 
                                                 {/* Close button */}
                                                 <IconButton
-                                                    icon={"close"}
+                                                    icon={() => <MaterialCommunityIcon name="close" size={25} color={colors.slate100} />}
                                                     size={25}
-                                                    style={{ position: 'absolute', top: 0, left: 5 }}
+                                                    style={{ position: 'absolute', top: 0, left: 5, zIndex: 100 }}
                                                     onPress={() => setSliderVisible(false)}
                                                 />
 
                                                 {/* Settings button */}
                                                 <IconButton
-                                                    icon={"cog-outline"}
+                                                    icon={() => <MaterialCommunityIcon name="cog-outline" size={25} color={colors.slate100} />}
                                                     size={25}
                                                     style={{ position: 'absolute', top: 0, right: 5 }}
                                                     onPress={() => handleSettingsOpen()}
@@ -332,6 +344,7 @@ export const Player = ({ navigator }) => {
                     {/* Video Metadata */}
                     {
                         size === "normal" &&
+                        isFullScreen === false &&
                         title.length > 0 &&
                         <View className="p-3 mb-4">
                             <Text numberOfLines={2} style={{ fontSize: 16, fontWeight: 900, color: "white" }}>{title || ""}</Text>
@@ -358,6 +371,7 @@ export const Player = ({ navigator }) => {
                     {/* Related streams */}
                     {
                         size === "normal" &&
+                        isFullScreen === false &&
                         relatedStreams.length > 0 &&
                         relatedStreams.map((stream, index) => {
                             return (
