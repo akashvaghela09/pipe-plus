@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View, StyleSheet, FlatList } from "react-native";
+import { Text, View, StyleSheet, FlatList, RefreshControl } from "react-native";
 import { pipePlus } from "../apis";
 import { IconButton, useTheme } from "react-native-paper";
 import { Header, VideoCard } from "../components";
@@ -8,8 +8,10 @@ export const SubscriptionScreen = () => {
     const { colors } = useTheme();
     const [subscriptionFeed, setSubscriptionFeed] = useState([]);
     const [visibleFeed, setVisibleFeed] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
 
     const fetchFeed = async () => {
+        setRefreshing(true)
         console.log("Fetching subscription feed ...");
 
         let list = await pipePlus.user.subscriptions();
@@ -35,12 +37,17 @@ export const SubscriptionScreen = () => {
         let feed = [...res.data];
 
         setSubscriptionFeed(feed);
+        setRefreshing(false);
     }
 
     const loadMoreItems = () => {
         const nextItems = subscriptionFeed.slice(visibleFeed.length, visibleFeed.length + 20); // Load next 20 items
         setVisibleFeed([...visibleFeed, ...nextItems]);
     };
+
+    const handleRefresh = () => {
+        fetchFeed();
+    }
 
     useEffect(() => {
         fetchFeed();
@@ -76,6 +83,12 @@ export const SubscriptionScreen = () => {
                     )}
                     onEndReached={loadMoreItems}
                     onEndReachedThreshold={0.95} // Load more items when the end of the list is halfway visible
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={handleRefresh}
+                        />
+                    }
                 />
             }
         </View>

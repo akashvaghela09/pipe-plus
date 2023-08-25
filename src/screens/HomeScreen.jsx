@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, RefreshControl } from "react-native";
 import { Header, VideoCard } from "../components/";
 import { useNavigation } from '@react-navigation/native';
 import { pipePlus } from "../apis";
 import { shuffleArray } from "../utils";
 import { IconButton } from "react-native-paper";
+import axios from "axios";
 
 export const HomeScreen = () => {
     const navigation = useNavigation();
     const [feedData, setFeedData] = useState([]);
     const [visibleFeed, setVisibleFeed] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
 
     const fetchFeed = async () => {
+        setRefreshing(true);  // Start refreshing
         console.log("Fetching feed data...");
 
         let list = await pipePlus.user.subscriptions();
@@ -35,12 +38,18 @@ export const HomeScreen = () => {
         }
 
         let feed = [...shuffleArray(res.data)];
+
         setFeedData(feed);
+        setRefreshing(false);  // End refreshing
     }
 
     const loadMoreItems = () => {
         const nextItems = feedData.slice(visibleFeed.length, visibleFeed.length + 20); // Load next 20 items
         setVisibleFeed([...visibleFeed, ...nextItems]);
+    };
+
+    const handleRefresh = () => {
+        fetchFeed();
     };
 
     useEffect(() => {
@@ -67,6 +76,12 @@ export const HomeScreen = () => {
                     )}
                     onEndReached={loadMoreItems}
                     onEndReachedThreshold={0.95} // Load more items when the end of the list is halfway visible
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={handleRefresh}
+                        />
+                    }
                 />
             }
 
