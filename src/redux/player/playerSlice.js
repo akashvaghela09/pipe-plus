@@ -8,7 +8,7 @@ const initialState = {
     isVisible: false,
     isLoading: false,
     size: "normal",
-    settingsOpen: false,
+    bottomSheetVisible: false,
     relatedStreams: [],
     availableQualities: [],
     streamQuality: "720p",
@@ -52,8 +52,8 @@ const playerSlice = createSlice({
         setSize: (state, action) => {
             state.size = action.payload;
         },
-        setSettingsOpen: (state, action) => {
-            state.settingsOpen = action.payload;
+        setBottomSheetVisible: (state, action) => {
+            state.bottomSheetVisible = action.payload;
         },
         setRelatedStreams: (state, action) => {
             state.relatedStreams = action.payload;
@@ -80,7 +80,7 @@ export const {
     setIsFullScreen,
     setIsVisible,
     setSize,
-    setSettingsOpen,
+    setBottomSheetVisible,
     setRelatedStreams,
     setAvailableQualities,
     setStreamQuality,
