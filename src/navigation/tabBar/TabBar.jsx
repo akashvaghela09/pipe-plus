@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native';
 import { TouchableRipple } from 'react-native-paper';
-import { screenOptions } from '../'; // Assuming both files are in the same directory
-import { PlayerSettings, Player } from '../../components/';
+import { screenOptions } from '../';
+import { Player } from '../../components/';
 import { useSelector } from 'react-redux';
 import { useTheme } from 'react-native-paper';
 
@@ -12,15 +12,13 @@ export const TabBar = ({ state, descriptors, navigation }) => {
     // const stackRouteName = stackRoute?.name;
     // const tabName = state.routes[state.index].name;
 
-    const { settingsOpen } = useSelector(state => state.player);
     const { tabBarVisible } = useSelector(state => state.app);
 
     return (
         <>
+            {/* Core Video Player */}
             <Player />
-            {
-                settingsOpen && <PlayerSettings />
-            }
+
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#0f0f0f', width: "auto", borderTopColor: "#212121", borderTopWidth: 1 }}>
                 {state.routes.map((route, index) => {
                     const { options } = descriptors[route.key];

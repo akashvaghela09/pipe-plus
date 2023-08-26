@@ -3,13 +3,13 @@ import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, Dimensions
 import { ActivityIndicator, IconButton, TouchableRipple } from 'react-native-paper';
 import { Button } from "../../theme/";
 import { useSelector, useDispatch } from 'react-redux';
-import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setSettingsOpen } from '../../redux/player/playerSlice';
+import { setIsFullScreen, setIsVisible, setStreamUrl, setSize, setIsPlaying, setBottomSheetVisible } from '../../redux/player/playerSlice';
 import Video from 'react-native-video';
 import { BackHandler } from 'react-native';
 import Slider from '@react-native-community/slider';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { formatNumbers, formatReadableDate, formatTime, isValid } from '../../utils';
-import { VideoCard } from '../';
+import { formatNumbers, formatReadableDate, formatTime } from '../../utils';
+import { PlayerSettings, VideoCard } from '../';
 import { useTheme } from 'react-native-paper';
 import { pipePlus } from '../../apis';
 import { setTabBarVisible } from '../../redux/app/appSlice';
@@ -27,7 +27,8 @@ export const Player = ({ navigator }) => {
         isPlaying,
         isLoading,
         relatedStreams,
-        streamMetadata
+        streamMetadata,
+        bottomSheetVisible
     } = useSelector(state => state.player);
 
     const {
@@ -44,7 +45,7 @@ export const Player = ({ navigator }) => {
     const [buffered, setBuffered] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [isSliderVisible, setSliderVisible] = useState(false);
+    const [isSliderVisible, setSliderVisible] = useState(true);
     const lastTap = useRef(null);
     const videoRef = useRef(null);
     const [isRippleVisible, setRippleVisible] = useState(false);
@@ -184,9 +185,18 @@ export const Player = ({ navigator }) => {
         }
     }
 
+    const handleBottomSheetVisibility = (value) => {
+        dispatch(setBottomSheetVisible(value));
+    }
+
     useEffect(() => {
         const backAction = () => {
             console.log("back button pressed");
+
+            if (bottomSheetVisible === true) {
+                handleBottomSheetVisibility(false);
+                return true;
+            }
 
             if (isFullScreen === true) {
                 handleFullScreen();
@@ -212,7 +222,7 @@ export const Player = ({ navigator }) => {
         );
 
         return () => backHandler.remove();
-    }, [size, isVisible, isFullScreen]);
+    }, [size, isVisible, isFullScreen, bottomSheetVisible]);
 
     useEffect(() => {
         if (isSliderVisible === true) {
@@ -234,6 +244,13 @@ export const Player = ({ navigator }) => {
         isVisible &&
         <TouchableOpacity activeOpacity={size === "small" ? 0.7 : 1} onPress={() => handlePlayerClick()}>
             <View className={`bg-[#0f0f0f] flex justify-center items-center ${size === "normal" && "h-screen w-full"}`}>
+
+                {/* Bottom Sheet for player settings */}
+                {
+                    bottomSheetVisible === true &&
+                    <PlayerSettings />
+                }
+
                 <ScrollView stickyHeaderIndices={[0]} style={{ width: "100%" }} className="flex flex-col">
                     {
                         isLoading ?
@@ -330,7 +347,7 @@ export const Player = ({ navigator }) => {
                                                     icon={() => <MaterialCommunityIcon name="cog-outline" size={25} color={colors.slate100} />}
                                                     size={25}
                                                     style={{ position: 'absolute', top: 0, right: 5 }}
-                                                    onPress={() => handleSettingsOpen()}
+                                                    onPress={() => handleBottomSheetVisibility(true)}
                                                 />
 
                                                 {/* Progress bar code */}
