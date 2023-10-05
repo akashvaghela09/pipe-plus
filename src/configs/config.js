@@ -1,8 +1,8 @@
 import instanceList from "../instances.json";
 
-// const streamUrls = instanceList.filter((instance) => instance.stream === true);
+const streamUrls = instanceList.filter((instance) => instance.stream === true);
 // const dataUrls = instanceList.filter((instance) => instance.data === true);
-// const feedUrls = instanceList.filter((instance) => instance.feed === true);
+const feedUrls = instanceList.filter((instance) => instance.feed === true);
 
 const randomInstance = (instances) => {
   const randomIndex = Math.floor(Math.random() * instances.length);
@@ -10,7 +10,6 @@ const randomInstance = (instances) => {
 };
 
 export const config = {
-  baseUrl: process.env.REACT_APP_PIPED_BASE_URL || randomInstance(instanceList).url,
-  feedUrl: "https://api-piped.mha.fi",
-  // feedUrl: "https://pipedapi.kavin.rocks",
+  baseUrl: "https://api-piped.mha.fi"
+  // baseUrl: randomInstance(["https://pipedapi.kavin.rocks", "https://api-piped.mha.fi"]) // "https://piped-api.lunar.icu"
 };
